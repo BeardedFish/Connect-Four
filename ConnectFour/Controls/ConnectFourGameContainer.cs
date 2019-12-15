@@ -68,6 +68,8 @@ namespace ConnectFour
         /// </summary>
         private Chip[,] gameBoardArray = new Chip[TOTAL_ROWS, TOTAL_COLUMNS];
 
+        private Point[] winCoordinates;
+
         public ConnectFourGameContainer()
         {
             this.DoubleBuffered = true;
@@ -138,6 +140,19 @@ namespace ConnectFour
             return false;
         }
 
+        private void updateWinCoordinates(int x1, int y1, int x2, int y2, int x3, int y3, int x4, int y4)
+        {
+            winCoordinates = new Point[]
+            {
+                new Point(x1, y1),
+                new Point(x2, y2),
+                new Point(x3, y3),
+                new Point(x4, y4)
+            };
+
+            this.Invalidate();
+        }
+
         /// <summary>
         /// 
         /// </summary>
@@ -148,11 +163,12 @@ namespace ConnectFour
             {
                 for (int col = 0; col < gameBoardArray.GetLength(1) - 3; col++)
                 {
-                    if (gameBoardArray[row, col] == Chip.Red 
-                        && gameBoardArray[row, col + 1] == Chip.Red 
-                        && gameBoardArray[row, col + 2] == Chip.Red 
+                    if (gameBoardArray[row, col] == Chip.Red
+                        && gameBoardArray[row, col + 1] == Chip.Red
+                        && gameBoardArray[row, col + 2] == Chip.Red
                         && gameBoardArray[row, col + 3] == Chip.Red)
                     {
+                        updateWinCoordinates(col, row, col + 1, row, col + 2, row, col + 3, row);
                         return Result.RedPlayerWins;
                     }
 
@@ -161,6 +177,8 @@ namespace ConnectFour
                          && gameBoardArray[row, col + 2] == Chip.Yellow
                          && gameBoardArray[row, col + 3] == Chip.Yellow)
                     {
+                        updateWinCoordinates(col, row, col + 1, row, col + 2, row, col + 3, row);
+                        this.Invalidate();
                         return Result.YellowPlayerWins;
                     }
 
@@ -176,6 +194,7 @@ namespace ConnectFour
                         && gameBoardArray[row + 2, col] == Chip.Red
                         && gameBoardArray[row + 3, col] == Chip.Red)
                     {
+                        updateWinCoordinates(col, row, col, row + 1, col, row + 2, col, row + 3);
                         return Result.RedPlayerWins;
                     }
 
@@ -184,6 +203,7 @@ namespace ConnectFour
                         && gameBoardArray[row + 2, col] == Chip.Yellow
                         && gameBoardArray[row + 3, col] == Chip.Yellow)
                     {
+                        updateWinCoordinates(col, row, col, row + 1, col, row + 2, col, row + 3);
                         return Result.YellowPlayerWins;
                     }
                 }
@@ -198,6 +218,7 @@ namespace ConnectFour
                         && gameBoardArray[row + 2, col + 2] == Chip.Red
                         && gameBoardArray[row + 3, col + 3] == Chip.Red)
                     {
+                        updateWinCoordinates(col, row, col + 1, row + 1, col + 2, row + 2, col + 3, row + 3);
                         return Result.RedPlayerWins;
                     }
 
@@ -206,6 +227,7 @@ namespace ConnectFour
                         && gameBoardArray[row + 2, col + 2] == Chip.Yellow
                         && gameBoardArray[row + 3, col + 3] == Chip.Yellow)
                     {
+                        updateWinCoordinates(col, row, col + 1, row + 1, col + 2, row + 2, col + 3, row + 3);
                         return Result.YellowPlayerWins;
                     }
                 }
@@ -220,6 +242,7 @@ namespace ConnectFour
                         && gameBoardArray[row + 2, col - 2] == Chip.Red
                         && gameBoardArray[row + 3, col - 3] == Chip.Red)
                     {
+                        updateWinCoordinates(col, row, col - 1, row + 1, col - 2, row + 2, col - 3, row + 3);
                         return Result.RedPlayerWins;
                     }
 
@@ -228,6 +251,7 @@ namespace ConnectFour
                         && gameBoardArray[row + 2, col - 2] == Chip.Yellow
                         && gameBoardArray[row + 3, col - 3] == Chip.Yellow)
                     {
+                        updateWinCoordinates(col, row, col - 1, row + 1, col - 2, row + 2, col - 3, row + 3);
                         return Result.YellowPlayerWins;
                     }
                 }
@@ -340,10 +364,10 @@ namespace ConnectFour
         {
             int chipOffset = 15;
 
-           /* Rectangle chipRect = new Rectangle(GAME_GRID_X_OFFSET + chipOffset + (col * BOX_WIDTH),
-                GAME_GRID_Y_OFFSET + row * BOX_HEIGHT + chipOffset,
-                chipWidth - chipOffset  + borderThickness,
-                chipHeight - chipOffset + borderThickness);*/
+            /* Rectangle chipRect = new Rectangle(GAME_GRID_X_OFFSET + chipOffset + (col * BOX_WIDTH),
+                 GAME_GRID_Y_OFFSET + row * BOX_HEIGHT + chipOffset,
+                 chipWidth - chipOffset  + borderThickness,
+                 chipHeight - chipOffset + borderThickness);*/
 
             Rectangle chipRect = new Rectangle(GAME_GRID_X_OFFSET + (col * BOX_WIDTH) + chipOffset,
                             GAME_GRID_Y_OFFSET + row * BOX_HEIGHT + chipOffset,
@@ -356,13 +380,6 @@ namespace ConnectFour
                 case Chip.Empty:
                     using (var br = new LinearGradientBrush(chipRect, Color.FromArgb(255, 255, 255), Color.FromArgb(215, 215, 215), 90))
                     {
-                        /*g.FillEllipse(br,
-                            GAME_GRID_X_OFFSET + chipOffset + (col * BOX_WIDTH),
-                            GAME_GRID_Y_OFFSET + row * BOX_HEIGHT + chipOffset,
-                            chipWidth - chipOffset + borderThickness,
-                            chipHeight - chipOffset + borderThickness );
-                        */
-
                         g.FillEllipse(br, chipRect);
                     }
                     break;
@@ -428,11 +445,28 @@ namespace ConnectFour
                 g.FillRectangle(br, gameRect);
             }
 
+
+
+
             int xOffset = 175;
             int yOffset = 75;
-
- 
             int lineThickness = 2;
+
+            if (winCoordinates != null)
+            {
+                for (int i = 0; i < winCoordinates.Length; i++)
+                {
+                    Rectangle winRect = new Rectangle(GAME_GRID_X_OFFSET + winCoordinates[i].X * BOX_WIDTH,
+                        GAME_GRID_Y_OFFSET + winCoordinates[i].Y * BOX_HEIGHT,
+                        BOX_WIDTH - lineThickness,
+                        BOX_HEIGHT - lineThickness);
+
+                    using (var br = new LinearGradientBrush(winRect, Color.FromArgb(168, 224, 99), Color.FromArgb(86, 171, 47), 90))
+                    {
+                        g.FillRectangle(br, winRect);
+                    }
+                }
+            }
 
             using (var pen = new Pen(Color.Black, lineThickness))
             {
@@ -446,6 +480,8 @@ namespace ConnectFour
                     g.DrawLine(pen, xOffset + (i * BOX_WIDTH), yOffset, xOffset + (i * BOX_WIDTH), yOffset + (BOX_HEIGHT * TOTAL_ROWS));
                 }
             }
+
+
 
             // Draw the grid
             for (int row = 0; row < gameBoardArray.GetLength(0); row++)

@@ -29,21 +29,11 @@
         private void InitializeComponent()
         {
             this.components = new System.ComponentModel.Container();
-            this.connectFourGameContainer1 = new ConnectFour.ConnectFourGameContainer();
             this.mainMenu1 = new System.Windows.Forms.MainMenu(this.components);
             this.menuItem1 = new System.Windows.Forms.MenuItem();
             this.menuItem2 = new System.Windows.Forms.MenuItem();
+            this.connectFourGameContainer1 = new ConnectFour.ConnectFourGameContainer();
             this.SuspendLayout();
-            // 
-            // connectFourGameContainer1
-            // 
-            this.connectFourGameContainer1.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.connectFourGameContainer1.Location = new System.Drawing.Point(0, 0);
-            this.connectFourGameContainer1.Margin = new System.Windows.Forms.Padding(2);
-            this.connectFourGameContainer1.Name = "connectFourGameContainer1";
-            this.connectFourGameContainer1.Size = new System.Drawing.Size(865, 566);
-            this.connectFourGameContainer1.TabIndex = 0;
-            this.connectFourGameContainer1.Text = "connectFourGameContainer1";
             // 
             // mainMenu1
             // 
@@ -61,13 +51,23 @@
             this.menuItem2.Index = 1;
             this.menuItem2.Text = "Help";
             // 
+            // connectFourGameContainer1
+            // 
+            this.connectFourGameContainer1.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.connectFourGameContainer1.Location = new System.Drawing.Point(0, 0);
+            this.connectFourGameContainer1.Margin = new System.Windows.Forms.Padding(4);
+            this.connectFourGameContainer1.Name = "connectFourGameContainer1";
+            this.connectFourGameContainer1.Size = new System.Drawing.Size(1586, 817);
+            this.connectFourGameContainer1.TabIndex = 0;
+            this.connectFourGameContainer1.Text = "connectFourGameContainer1";
+            // 
             // Form1
             // 
-            this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
+            this.AutoScaleDimensions = new System.Drawing.SizeF(11F, 24F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(865, 566);
+            this.ClientSize = new System.Drawing.Size(1586, 817);
             this.Controls.Add(this.connectFourGameContainer1);
-            this.Margin = new System.Windows.Forms.Padding(2);
+            this.Margin = new System.Windows.Forms.Padding(4);
             this.Menu = this.mainMenu1;
             this.Name = "Form1";
             this.Text = "Form1";
