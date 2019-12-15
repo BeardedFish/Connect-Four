@@ -57,7 +57,7 @@
             this.connectFourGameContainer1.Location = new System.Drawing.Point(0, 0);
             this.connectFourGameContainer1.Margin = new System.Windows.Forms.Padding(4);
             this.connectFourGameContainer1.Name = "connectFourGameContainer1";
-            this.connectFourGameContainer1.Size = new System.Drawing.Size(1586, 817);
+            this.connectFourGameContainer1.Size = new System.Drawing.Size(1326, 901);
             this.connectFourGameContainer1.TabIndex = 0;
             this.connectFourGameContainer1.Text = "connectFourGameContainer1";
             // 
@@ -65,12 +65,12 @@
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(11F, 24F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(1586, 817);
+            this.ClientSize = new System.Drawing.Size(1326, 901);
             this.Controls.Add(this.connectFourGameContainer1);
             this.Margin = new System.Windows.Forms.Padding(4);
             this.Menu = this.mainMenu1;
             this.Name = "Form1";
-            this.Text = "Form1";
+            this.Text = "Connect Four - Version 1.0 | By: Darian Benam";
             this.ResumeLayout(false);
 
         }
