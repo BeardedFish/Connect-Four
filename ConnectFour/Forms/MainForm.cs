@@ -20,10 +20,10 @@ namespace ConnectFour
 
         private void subscribeToEvents()
         {
-            connectFourGameContainer1.OnColumnFull += ConnectFourGameContainer_OnColumnFull;
-            connectFourGameContainer1.OnGameFinished += ConnectFourGameContainer_OnGameFinished;
-            connectFourGameContainer1.OnNewGame += ConnectFourGameContainer_OnNewGame;
-            connectFourGameContainer1.OnPlayerTurnChange += ConnectFourGameContainer_OnPlayerTurnChange;
+            connectFourGameContainer.OnColumnFull += ConnectFourGameContainer_OnColumnFull;
+            connectFourGameContainer.OnGameFinished += ConnectFourGameContainer_OnGameFinished;
+            connectFourGameContainer.OnNewGame += ConnectFourGameContainer_OnNewGame;
+            connectFourGameContainer.OnPlayerTurnChange += ConnectFourGameContainer_OnPlayerTurnChange;
         }
 
         private void updateTitleStatingTurn(bool isRedPlayerTurn)

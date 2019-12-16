@@ -120,12 +120,20 @@ namespace ConnectFour
         private int gridBoxHeight;
 
         /// <summary>
-        /// 
+        /// States the current column the mouse is hovering over. This number represents an array index for
+        /// the 'gameBoardArray'.
         /// </summary>
-        private bool opponentIsComputer = true;
+        private int hoveredColumn;
 
         /// <summary>
-        /// States whether the Connect Four game is over or not.
+        /// States whether the yellow player is computer based (meaning that the computer will make moves when
+        /// the red player has made a move) or not. If the yellow player is not computer based, then that means
+        /// that the yellow player is able to make a move like the red player by using the mouse.
+        /// </summary>
+        private bool isOpponentIsComputer = true;
+
+        /// <summary>
+        /// States whether the Connect Four game is over or not (somebody won or it ended in a tie).
         /// </summary>
         private bool gameOver = false;
 
@@ -145,10 +153,14 @@ namespace ConnectFour
         private int yellowPlayerWinTotal = 0;
 
         /// <summary>
-        /// An a
+        /// An 2-dimensional array that represents the Connect Four board. By default, every element inside
+        /// this array should be set to empty.
         /// </summary>
         private Chip[,] gameBoardArray = new Chip[TOTAL_ROWS, TOTAL_COLUMNS];
 
+        /// <summary>
+        /// 
+        /// </summary>
         private Font scoreFont = new Font("Arial", 12, FontStyle.Regular);
 
         /// <summary>
@@ -157,7 +169,7 @@ namespace ConnectFour
         private Point[] winCoordinates;
 
         /// <summary>
-        /// 
+        /// A random object used for generating random numbers for the Connect Four game container.
         /// </summary>
         private Random random = new Random();
 
@@ -191,6 +203,10 @@ namespace ConnectFour
             playSoundEffect(Resources.Game_Over_Sound_Effect);
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="soundResource">The UnmanagedMemoryStream object that contains the sound that should be played.</param>
         private void playSoundEffect(UnmanagedMemoryStream soundResource)
         {
             using (SoundPlayer popSound = new SoundPlayer(soundResource))
@@ -209,7 +225,7 @@ namespace ConnectFour
                 case Result.OngoingGame:
                     switchTurns();
 
-                    if (!redPlayerTurn && opponentIsComputer)
+                    if (!redPlayerTurn && isOpponentIsComputer)
                     {
                         makeComputerDoMove();
                     }
@@ -258,7 +274,7 @@ namespace ConnectFour
             winCoordinates = null;
             clearGameBoard();
 
-            if (opponentIsComputer && !redPlayerTurn)
+            if (isOpponentIsComputer && !redPlayerTurn)
             {
                 makeComputerDoMove();
             }
@@ -286,11 +302,11 @@ namespace ConnectFour
         }
 
         /// <summary>
-        /// 
+        /// Places a game chip on the board at a specified column and row.
         /// </summary>
-        /// <param name="col"></param>
-        /// <param name="row"></param>
-        private void placeChipInColumn(int col, int row)
+        /// <param name="col">The column to place the chip in.</param>
+        /// <param name="row">The row to place the chip in.</param>
+        private void placedGameChip(int col, int row)
         {
             if (redPlayerTurn)
             {
@@ -313,7 +329,9 @@ namespace ConnectFour
         /// Searches a specific column for an empty row number where a chip exists under it.
         /// </summary>
         /// <param name="col">The column to be searched.</param>
-        /// <returns>Either -1 which means the column is full or a number that represents a row number index for the 'gameBoardArray' array.</returns>
+        /// <returns>Either -1 which means the column is full or a number that represents a row number index 
+        /// for the 'gameBoardArray' array.
+        /// </returns>
         private int getRowToPlaceChip(int col)
         {
             int startRow = TOTAL_ROWS - 1;
@@ -330,7 +348,8 @@ namespace ConnectFour
         }
 
         /// <summary>
-        /// 
+        /// States whether the game board is filled in completely, meaning that it is filled with
+        /// either 
         /// </summary>
         /// <returns>A boolean that states whether the game board grid is filled or not.</returns>
         private bool isGridFilled()
@@ -356,6 +375,17 @@ namespace ConnectFour
             return false;
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="x1"></param>
+        /// <param name="y1"></param>
+        /// <param name="x2"></param>
+        /// <param name="y2"></param>
+        /// <param name="x3"></param>
+        /// <param name="y3"></param>
+        /// <param name="x4"></param>
+        /// <param name="y4"></param>
         private void updateWinCoordinates(int x1, int y1, int x2, int y2, int x3, int y3, int x4, int y4)
         {
             winCoordinates = new Point[]
@@ -481,45 +511,43 @@ namespace ConnectFour
             return Result.OngoingGame;
         }
 
-        private int hoveredColumn;
-
         /// <summary>
         /// 
         /// </summary>
         /// <param name="e"></param>
         protected override void OnMouseMove(MouseEventArgs e)
         {
-            try
+            int hoverColumn = (e.X - GAME_GRID_X_OFFSET) / gridBoxWidth;
+
+            if (hoverColumn < 0)
             {
-                int hoverColumn = (e.X - GAME_GRID_X_OFFSET) / gridBoxWidth;
-
-                if (hoverColumn < 0)
-                {
-                    hoverColumn = 0;
-                }
-
-                if (hoverColumn >= TOTAL_COLUMNS)
-                {
-                    hoverColumn = TOTAL_COLUMNS - 1;
-                }
-
-                if (hoveredColumn != hoverColumn)
-                {
-                    hoveredColumn = hoverColumn;
-                    this.Invalidate();
-                }
+                hoverColumn = 0;
             }
-            catch
-            {
 
+            if (hoverColumn >= TOTAL_COLUMNS)
+            {
+                hoverColumn = TOTAL_COLUMNS - 1;
+            }
+
+            if (hoveredColumn != hoverColumn)
+            {
+                hoveredColumn = hoverColumn;
+                this.Invalidate();
             }
         }
 
         private void makeComputerDoMove()
         {
+            // NOTE: Only reason we making the computer make a move on a new thread is because we are delaying
+            //       the chip placement from around 500 ms to 1500 ms in order to simulate the opponent player
+            //       "thinking." In order to delay, we use the Thread.Sleep() method, however, if we don't do
+            //       this on a separate thread then the main thread will hang, causing the program to freeze
+            //       until Thread.Sleep() has finished.
             new Thread(() =>
             {
                 Thread.CurrentThread.IsBackground = true;
+
+                // Generate a random number from 500 to 1500 and make the thread sleep for that duration (in milliseconds)
                 Thread.Sleep(random.Next(500, 1500));
 
                 int randColumn;
@@ -531,9 +559,9 @@ namespace ConnectFour
 
                     row = getRowToPlaceChip(randColumn);
 
-                    if (row != -1)
+                    if (row != -1) // Only place a game chip in an empty column/row.
                     {
-                        placeChipInColumn(randColumn, row);
+                        placedGameChip(randColumn, row);
                         break;
                     }
                 }
@@ -541,9 +569,9 @@ namespace ConnectFour
         }
 
         /// <summary>
-        /// 
+        /// Any mouse click on the Connect Four game container is handled here.
         /// </summary>
-        /// <param name="e"></param>
+        /// <param name="e">The mouse event arguments for when the game container is clicked.</param>
         protected override void OnMouseClick(MouseEventArgs e)
         {
             if (gameOver)
@@ -552,17 +580,17 @@ namespace ConnectFour
             }
             else
             {
-                if (opponentIsComputer && !redPlayerTurn)
+                if (isOpponentIsComputer && !redPlayerTurn)
                 {
                     return;
                 }
 
                 int row = getRowToPlaceChip(hoveredColumn);
-                if (row != -1)
+                if (row != -1) // Not equal to -1 means that the column is not full
                 {
-                    placeChipInColumn(hoveredColumn, row);
+                    placedGameChip(hoveredColumn, row);
                 }
-                else
+                else // The column is full
                 {
                     if (OnColumnFull != null)
                     {
@@ -626,6 +654,7 @@ namespace ConnectFour
                     break;
             }
 
+            // Draw the border of the game chip
             using (var pen = new Pen(Color.Black, borderThickness))
             {
                 g.DrawEllipse(pen, chipRect);
@@ -633,15 +662,15 @@ namespace ConnectFour
         }
 
         /// <summary>
-        /// 
+        /// Repeatedly updates and paints the game container for the Connect Four game.
         /// </summary>
-        /// <param name="e"></param>
+        /// <param name="e">The event arguments for when the game container is painted.</param>
         protected override void OnPaint(PaintEventArgs e)
         {
             Graphics g = e.Graphics;
             g.SmoothingMode = SmoothingMode.AntiAlias;
 
-            int lineThickness = 2;
+            int lineThickness = 2; // The line thickness for the outlines of objects drawn on the game container, in pixels.
 
             // Draw game container background
             using (var br = new LinearGradientBrush(this.ClientRectangle, Color.FromArgb(3, 78, 146), Color.FromArgb(3, 5, 40), 45))
@@ -649,6 +678,7 @@ namespace ConnectFour
                 g.FillRectangle(br, this.ClientRectangle);
             }
 
+            // Draw the table floor for the game board to stand on
             using (var br = new LinearGradientBrush(this.ClientRectangle, Color.FromArgb(126, 85, 63), Color.FromArgb(64, 42, 29), 90))
             {
                 int tableXOffset = 50;
@@ -662,25 +692,20 @@ namespace ConnectFour
 
                 g.FillPolygon(br, floorPointsArray);
 
+                // Draw a black outline for the table
                 using (var p = new Pen(Color.Black, lineThickness))
                 {
                     g.DrawPolygon(p, floorPointsArray);
                 }
             }
 
-
-            Rectangle gameRect = new Rectangle(GAME_GRID_X_OFFSET, GAME_GRID_Y_OFFSET, this.Width - GAME_GRID_X_OFFSET * 2, this.Height - GAME_GRID_Y_OFFSET * 2 - 2);
-            using (var br = new LinearGradientBrush(gameRect, Color.FromArgb(64, 138, 196), Color.FromArgb(18, 82, 129), 90))
+            Rectangle gameBoardRect = new Rectangle(GAME_GRID_X_OFFSET, GAME_GRID_Y_OFFSET, this.Width - GAME_GRID_X_OFFSET * 2, this.Height - GAME_GRID_Y_OFFSET * 2 - 2);
+            using (var br = new LinearGradientBrush(gameBoardRect, Color.FromArgb(64, 138, 196), Color.FromArgb(18, 82, 129), 90))
             {
-                g.FillRectangle(br, gameRect);
+                g.FillRectangle(br, gameBoardRect);
             }
 
-
-
-
-            int xOffset = 175;
-            int yOffset = 75;
-
+            // Draw a green background behind the winning chips
             if (winCoordinates != null)
             {
                 for (int i = 0; i < winCoordinates.Length; i++)
@@ -697,23 +722,21 @@ namespace ConnectFour
                 }
             }
 
+            // Draw the grid lines for the game board
             using (var pen = new Pen(Color.Black, lineThickness))
             {
                 for (int i = 0; i <= TOTAL_ROWS; i++)
                 {
-                    g.DrawLine(pen, xOffset, yOffset + (i * gridBoxHeight), this.Width - xOffset, yOffset + (i * gridBoxHeight));
+                    g.DrawLine(pen, GAME_GRID_X_OFFSET, GAME_GRID_Y_OFFSET + (i * gridBoxHeight), this.Width - GAME_GRID_X_OFFSET, GAME_GRID_Y_OFFSET + (i * gridBoxHeight));
                 }
 
                 for (int i = 0; i <= TOTAL_COLUMNS; i++)
                 {
-
-                    g.DrawLine(pen, xOffset + (i * gridBoxWidth) + 1, yOffset, xOffset + (i * gridBoxWidth) + 1, yOffset + (gridBoxHeight * TOTAL_ROWS));
+                    g.DrawLine(pen, GAME_GRID_X_OFFSET + (i * gridBoxWidth) + 1, GAME_GRID_Y_OFFSET, GAME_GRID_X_OFFSET + (i * gridBoxWidth) + 1, GAME_GRID_Y_OFFSET + (gridBoxHeight * TOTAL_ROWS));
                 }
             }
 
-
-
-            // Draw the grid
+            // Draw the chips (empty, red, or yellow)
             for (int row = 0; row < gameBoardArray.GetLength(0); row++)
             {
                 for (int col = 0; col < gameBoardArray.GetLength(1); col++)
@@ -722,14 +745,16 @@ namespace ConnectFour
                 }
             }
 
+            // Draw the hovering chip above the game board
             if (!gameOver && !DesignMode)
             {
                 Chip hoverChipType = redPlayerTurn ? Chip.Red : Chip.Yellow;
 
-                if (opponentIsComputer)
+                if (isOpponentIsComputer)
                 {
-                    if (redPlayerTurn)
+                    if (redPlayerTurn) // No need to draw the yellow chip if the opponent is a computer
                     {
+                        // Fun fact: Since the game board is coordinate based, we can placed
                         drawChip(g, hoverChipType, hoveredColumn, -1, 2);
                     }
                 }
