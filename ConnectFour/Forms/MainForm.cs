@@ -21,7 +21,7 @@ namespace ConnectFour
         private void subscribeToEvents()
         {
             connectFourGameContainer.OnColumnFull += ConnectFourGameContainer_OnColumnFull;
-            connectFourGameContainer.OnGameFinished += ConnectFourGameContainer_OnGameFinished;
+            connectFourGameContainer.OnGameOver += ConnectFourGameContainer_OnGameFinished;
             connectFourGameContainer.OnNewGame += ConnectFourGameContainer_OnNewGame;
             connectFourGameContainer.OnPlayerTurnChange += ConnectFourGameContainer_OnPlayerTurnChange;
         }
