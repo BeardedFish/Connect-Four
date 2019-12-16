@@ -3,6 +3,9 @@ using System.Drawing;
 using System.Drawing.Drawing2D;
 using System.Windows.Forms;
 using System.Threading;
+using System.Media;
+using ConnectFour.Properties;
+using System.IO;
 
 namespace ConnectFour
 {
@@ -19,6 +22,51 @@ namespace ConnectFour
         /// 
         /// </summary>
         public event GameFinishedHandler OnGameFinished;
+
+        /// <summary>
+        /// A delegate event handler for when a chip in the game board.
+        /// </summary>
+        /// <param name="sender">The object that raised the event.</param>
+        public delegate void ChipPlacedHandler(object sender);
+
+        /// <summary>
+        /// 
+        /// </summary>
+        public event ChipPlacedHandler OnChipPlaced;
+
+        /// <summary>
+        /// A delegate event handler for when a player clicked on a column and it is full.
+        /// </summary>
+        /// <param name="sender">The object that raised the event.</param>
+        public delegate void ColumnFullHandler(object sender);
+
+        /// <summary>
+        /// 
+        /// </summary>
+        public event ColumnFullHandler OnColumnFull;
+
+        /// <summary>
+        /// A delegate event handler for when a player clicked on a column and it is full.
+        /// </summary>
+        /// <param name="sender">The object that raised the event.</param>
+        public delegate void PlayerTurnChangedHandler(object sender, bool redPlayerTurn);
+
+        /// <summary>
+        /// 
+        /// </summary>
+        public event PlayerTurnChangedHandler OnPlayerTurnChange;
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="redPlayerTurn"></param>
+        public delegate void NewGameHandler(object sender, bool redPlayerTurn);
+
+        /// <summary>
+        /// 
+        /// </summary>
+        public event NewGameHandler OnNewGame;
 
         /// <summary>
         /// An enum that holds all the possible results after a player places a chip in the game board.
@@ -101,8 +149,10 @@ namespace ConnectFour
         /// </summary>
         private Chip[,] gameBoardArray = new Chip[TOTAL_ROWS, TOTAL_COLUMNS];
 
+        private Font scoreFont = new Font("Arial", 12, FontStyle.Regular);
+
         /// <summary>
-        /// 
+        /// An array of points that states where a player has won the game (4 chips in a row).
         /// </summary>
         private Point[] winCoordinates;
 
@@ -122,7 +172,81 @@ namespace ConnectFour
             gridBoxWidth = (this.Width - GAME_GRID_X_OFFSET * 2) / TOTAL_COLUMNS;
             gridBoxHeight = (this.Height - GAME_GRID_Y_OFFSET * 2) / TOTAL_ROWS;
 
+            subscribeToEvents();
+
             StartNewGame();
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        private void subscribeToEvents()
+        {
+            this.OnChipPlaced += ConnectFourGameContainer_OnChipPlaced;
+            this.OnGameFinished += ConnectFourGameContainer_OnGameFinished;
+        }
+
+        private void ConnectFourGameContainer_OnGameFinished(object sender, Result gameResult)
+        {
+            playSoundEffect(Resources.Game_Over_Sound_Effect);
+        }
+
+        private void playSoundEffect(UnmanagedMemoryStream soundResource)
+        {
+            using (SoundPlayer popSound = new SoundPlayer(soundResource))
+            {
+                popSound.Play();
+            }
+        }
+
+        private void ConnectFourGameContainer_OnChipPlaced(object sender)
+        {
+            playSoundEffect(Resources.Pop_Sound_Effect);
+
+            Result gameResult = getGameResult();
+            switch (gameResult)
+            {
+                case Result.OngoingGame:
+                    switchTurns();
+
+                    if (!redPlayerTurn && opponentIsComputer)
+                    {
+                        makeComputerDoMove();
+                    }
+                    break;
+                case Result.RedPlayerWins:
+                    redPlayerWinTotal++;
+                    break;
+                case Result.TiedGame:
+
+                    break;
+                case Result.YellowPlayerWins:
+                    yellowPlayerWinTotal++;
+                    break;
+            }
+
+            if (gameResult != Result.OngoingGame)
+            {
+                if (OnGameFinished != null)
+                {
+                    OnGameFinished(this, gameResult);
+                }
+
+                gameOver = true;
+            }
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        private void switchTurns()
+        {
+            redPlayerTurn = !redPlayerTurn;
+            
+            if (OnPlayerTurnChange != null)
+            {
+                OnPlayerTurnChange(this, redPlayerTurn);
+            }
         }
 
         /// <summary>
@@ -133,6 +257,18 @@ namespace ConnectFour
             gameOver = false;
             winCoordinates = null;
             clearGameBoard();
+
+            if (opponentIsComputer && !redPlayerTurn)
+            {
+                makeComputerDoMove();
+            }
+
+            if (OnNewGame != null)
+            {
+                OnNewGame(this, redPlayerTurn);
+            }
+
+            this.Invalidate();
         }
         
         /// <summary>
@@ -163,6 +299,11 @@ namespace ConnectFour
             else
             {
                 gameBoardArray[row, col] = Chip.Yellow;
+            }
+
+            if (OnChipPlaced != null)
+            {
+                OnChipPlaced(this);
             }
 
             this.Invalidate();
@@ -393,12 +534,9 @@ namespace ConnectFour
                     if (row != -1)
                     {
                         placeChipInColumn(randColumn, row);
-
                         break;
                     }
                 }
-
-                redPlayerTurn = !redPlayerTurn;
             }).Start();
         }
 
@@ -408,47 +546,28 @@ namespace ConnectFour
         /// <param name="e"></param>
         protected override void OnMouseClick(MouseEventArgs e)
         {
-            if (gameOver) // No reason to process mouse clicks if the game is over.
+            if (gameOver)
             {
-                return;
+                StartNewGame();
             }
-
-            int row = getRowToPlaceChip(hoveredColumn);
-            if (row != -1)
+            else
             {
-                placeChipInColumn(hoveredColumn, row);
-
-                Result gameResult = getGameResult();
-                switch (gameResult)
+                if (opponentIsComputer && !redPlayerTurn)
                 {
-                    case Result.OngoingGame:
-                        redPlayerTurn = !redPlayerTurn;
-
-                        if (!redPlayerTurn && opponentIsComputer)
-                        {
-                            makeComputerDoMove();
-                        }
-
-                        break;
-                    case Result.RedPlayerWins:
-                        redPlayerWinTotal++;
-                        break;
-                    case Result.TiedGame:
-
-                        break;
-                    case Result.YellowPlayerWins:
-                        yellowPlayerWinTotal++;
-                        break;
+                    return;
                 }
 
-                if (gameResult != Result.OngoingGame)
+                int row = getRowToPlaceChip(hoveredColumn);
+                if (row != -1)
                 {
-                    if (OnGameFinished != null)
+                    placeChipInColumn(hoveredColumn, row);
+                }
+                else
+                {
+                    if (OnColumnFull != null)
                     {
-                        OnGameFinished(this, gameResult);
+                        OnColumnFull(this);
                     }
-
-                    gameOver = true;
                 }
             }
         }
@@ -532,15 +651,17 @@ namespace ConnectFour
 
             using (var br = new LinearGradientBrush(this.ClientRectangle, Color.FromArgb(126, 85, 63), Color.FromArgb(64, 42, 29), 90))
             {
+                int tableXOffset = 50;
                 Point[] floorPointsArray =
                 {
-                    new Point(0, this.Height),
-                    new Point(GAME_GRID_X_OFFSET - (gridBoxWidth / 2), this.Height - GAME_GRID_Y_OFFSET - (gridBoxHeight / 2)),
-                    new Point(this.Width - GAME_GRID_X_OFFSET + (gridBoxWidth / 2), this.Height - GAME_GRID_Y_OFFSET - (gridBoxHeight / 2)),
-                    new Point(this.Width, this.Height)
+                    new Point(0, this.Height + lineThickness),
+                    new Point(tableXOffset, this.Height - GAME_GRID_Y_OFFSET - (gridBoxHeight / 2)),
+                    new Point(this.Width - tableXOffset, this.Height - GAME_GRID_Y_OFFSET - (gridBoxHeight / 2)),
+                    new Point(this.Width, this.Height + lineThickness)
                 };
 
                 g.FillPolygon(br, floorPointsArray);
+
                 using (var p = new Pen(Color.Black, lineThickness))
                 {
                     g.DrawPolygon(p, floorPointsArray);
@@ -566,8 +687,8 @@ namespace ConnectFour
                 {
                     Rectangle winRect = new Rectangle(GAME_GRID_X_OFFSET + winCoordinates[i].X * gridBoxWidth,
                         GAME_GRID_Y_OFFSET + winCoordinates[i].Y * gridBoxHeight,
-                        gridBoxWidth - lineThickness,
-                        gridBoxHeight - lineThickness);
+                        gridBoxWidth,
+                        gridBoxHeight);
 
                     using (var br = new LinearGradientBrush(winRect, Color.FromArgb(168, 224, 99), Color.FromArgb(86, 171, 47), 90))
                     {
@@ -585,7 +706,8 @@ namespace ConnectFour
 
                 for (int i = 0; i <= TOTAL_COLUMNS; i++)
                 {
-                    g.DrawLine(pen, xOffset + (i * gridBoxWidth), yOffset, xOffset + (i * gridBoxWidth), yOffset + (gridBoxHeight * TOTAL_ROWS));
+
+                    g.DrawLine(pen, xOffset + (i * gridBoxWidth) + 1, yOffset, xOffset + (i * gridBoxWidth) + 1, yOffset + (gridBoxHeight * TOTAL_ROWS));
                 }
             }
 
@@ -611,13 +733,19 @@ namespace ConnectFour
                         drawChip(g, hoverChipType, hoveredColumn, -1, 2);
                     }
                 }
-                else 
+                else
                 {
                     drawChip(g, hoverChipType, hoveredColumn, -1, 2);
                 }
             }
 
             g.DrawString("Connect Four - Version 1.0 | By: Darian Benam", this.Font, Brushes.White, 5, 5);
+
+            // Draw the total win scores for the player 1 (red) and player 2 (yellow):
+            StringFormat sf = new StringFormat();
+            sf.LineAlignment = StringAlignment.Center;
+            sf.Alignment = StringAlignment.Center;
+            g.DrawString(redPlayerWinTotal + " : " + yellowPlayerWinTotal, scoreFont, Brushes.White, new Rectangle(0, 0, this.Width, (this.Height * 2) - 48), sf);
         }
     }
 }

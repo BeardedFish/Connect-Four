@@ -9,11 +9,64 @@ using System.Windows.Forms;
 
 namespace ConnectFour
 {
-    public partial class Form1 : Form
+    public partial class MainForm : Form
     {
-        public Form1()
+        private const string FORM_TITLE = "Connect Four - By Darian Benam";
+        public MainForm()
         {
             InitializeComponent();
+            subscribeToEvents();
+        }
+
+        private void subscribeToEvents()
+        {
+            connectFourGameContainer1.OnColumnFull += ConnectFourGameContainer_OnColumnFull;
+            connectFourGameContainer1.OnGameFinished += ConnectFourGameContainer_OnGameFinished;
+            connectFourGameContainer1.OnNewGame += ConnectFourGameContainer_OnNewGame;
+            connectFourGameContainer1.OnPlayerTurnChange += ConnectFourGameContainer_OnPlayerTurnChange;
+        }
+
+        private void updateTitleStatingTurn(bool isRedPlayerTurn)
+        {
+            if (this != null)
+            {
+                string turnText = isRedPlayerTurn ? "Red Players Turn" : "Yellow Players Turn";
+                this.Invoke(new Action(() => this.Text = FORM_TITLE + " | " + turnText));
+            }
+        }
+
+        private void ConnectFourGameContainer_OnNewGame(object sender, bool redPlayerTurn)
+        {
+            updateTitleStatingTurn(redPlayerTurn);
+        }
+
+        private void ConnectFourGameContainer_OnGameFinished(object sender, ConnectFourGameContainer.Result gameResult)
+        {
+            string resultText = "";
+            switch (gameResult)
+            {
+                case ConnectFourGameContainer.Result.RedPlayerWins:
+                    resultText = "Red player has won.";
+                    break;
+                case ConnectFourGameContainer.Result.TiedGame:
+                    resultText = "Game ended in a tie.";
+                    break;
+                case ConnectFourGameContainer.Result.YellowPlayerWins:
+                    resultText = "Yellow player has won.";
+                    break;
+            }
+
+            this.Invoke(new Action(() => this.Text = FORM_TITLE + " | Game over! " + resultText));
+        }
+
+        private void ConnectFourGameContainer_OnPlayerTurnChange(object sender, bool redPlayerTurn)
+        {
+            updateTitleStatingTurn(redPlayerTurn);
+        }
+
+        private void ConnectFourGameContainer_OnColumnFull(object sender)
+        {
+            MessageBox.Show("Uh-oh. The column you clicked on seems to be full. Please try a different column", "Yikes!", MessageBoxButtons.OK, MessageBoxIcon.Warning);
         }
     }
 }
