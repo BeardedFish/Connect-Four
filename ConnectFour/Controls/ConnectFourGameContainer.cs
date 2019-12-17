@@ -133,6 +133,11 @@ namespace ConnectFour
         private bool isOpponentIsComputer = true;
 
         /// <summary>
+        /// 
+        /// </summary>
+        private bool muteSoundEffects = false;
+
+        /// <summary>
         /// States whether the Connect Four game is over or not (somebody won or it ended in a tie).
         /// </summary>
         private bool gameOver = false;
@@ -174,7 +179,7 @@ namespace ConnectFour
         private Random random = new Random();
 
         /// <summary>
-        /// 
+        /// Creates a control that contains a fully working Connect Four game.
         /// </summary>
         public ConnectFourGameContainer()
         {
@@ -185,12 +190,51 @@ namespace ConnectFour
             gridBoxHeight = (this.Height - GAME_BOARD_Y_PADDING * 2) / TOTAL_ROWS;
 
             subscribeToEvents();
-
-            StartNewGame();
         }
 
         /// <summary>
         /// 
+        /// </summary>
+        /// <param name="e"></param>
+        protected override void OnHandleCreated(EventArgs e)
+        {
+            StartNewGame();
+        }
+
+        /// <summary>
+        /// Clears the Connect Four game board and starts a new game.
+        /// </summary>
+        public void StartNewGame()
+        {
+            // Reset some variables
+            gameOver = false;
+            winCoordinates = null;
+
+            // Clear the game board
+            clearGameBoard();
+
+            if (isOpponentIsComputer && !redPlayerTurn)
+            {
+                makeComputerDoMove();
+            }
+
+            // Raise the event that a new game has started
+            if (OnNewGame != null)
+            {
+                OnNewGame(this, redPlayerTurn);
+            }
+
+            // Repaint the game container
+            this.Invalidate();
+        }
+
+        public void ToggleSoundEffects(bool muteSound)
+        {
+            muteSoundEffects = muteSound;
+        }
+
+        /// <summary>
+        /// Subscribes to some events that the game container has.
         /// </summary>
         private void subscribeToEvents()
         {
@@ -198,25 +242,41 @@ namespace ConnectFour
             this.OnGameOver += ConnectFourGameContainer_OnGameFinished;
         }
 
+        /// <summary>
+        /// Plays a sound effect contained in a UnmanagedMemoryStream object.
+        /// </summary>
+        /// <param name="soundResource">The UnmanagedMemoryStream object that contains the sound that should be played.</param>
+        private void playSoundEffect(UnmanagedMemoryStream soundResource)
+        {
+            if (muteSoundEffects)
+            {
+                return;
+            }
+
+            using (SoundPlayer soundEffect = new SoundPlayer(soundResource))
+            {
+                soundEffect.Play();
+            }
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="gameResult"></param>
         private void ConnectFourGameContainer_OnGameFinished(object sender, Result gameResult)
         {
+            // Play the game over sound effect
             playSoundEffect(Resources.Game_Over_Sound_Effect);
         }
 
         /// <summary>
         /// 
         /// </summary>
-        /// <param name="soundResource">The UnmanagedMemoryStream object that contains the sound that should be played.</param>
-        private void playSoundEffect(UnmanagedMemoryStream soundResource)
-        {
-            using (SoundPlayer popSound = new SoundPlayer(soundResource))
-            {
-                popSound.Play();
-            }
-        }
-
+        /// <param name="sender">The object that raised the event.</param>
         private void ConnectFourGameContainer_OnChipPlaced(object sender)
         {
+            // Play the pop sound effect
             playSoundEffect(Resources.Pop_Sound_Effect);
 
             // Check the game outcome to see if there is a winner
@@ -261,34 +321,11 @@ namespace ConnectFour
         private void switchTurns()
         {
             redPlayerTurn = !redPlayerTurn;
-            
+
             if (OnPlayerTurnChange != null)
             {
                 OnPlayerTurnChange(this, redPlayerTurn);
             }
-        }
-
-        /// <summary>
-        /// Clears the Connect Four game board and starts a new game.
-        /// </summary>
-        public void StartNewGame()
-        {
-            gameOver = false;
-            winCoordinates = null;
-            clearGameBoard();
-
-            if (isOpponentIsComputer && !redPlayerTurn)
-            {
-                makeComputerDoMove();
-            }
-
-            if (OnNewGame != null)
-            {
-                OnNewGame(this, redPlayerTurn);
-            }
-
-            // Repaint the game container
-            this.Invalidate();
         }
         
         /// <summary>

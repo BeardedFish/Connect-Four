@@ -31,14 +31,14 @@
             this.components = new System.ComponentModel.Container();
             this.mainMenu1 = new System.Windows.Forms.MainMenu(this.components);
             this.menuItem1 = new System.Windows.Forms.MenuItem();
-            this.menuItem2 = new System.Windows.Forms.MenuItem();
-            this.connectFourGameContainer = new ConnectFour.ConnectFourGameContainer();
-            this.menuItem3 = new System.Windows.Forms.MenuItem();
             this.mnuNewGame = new System.Windows.Forms.MenuItem();
             this.menuItem5 = new System.Windows.Forms.MenuItem();
             this.mnuExit = new System.Windows.Forms.MenuItem();
+            this.menuItem3 = new System.Windows.Forms.MenuItem();
             this.mnuMuteSoundEffects = new System.Windows.Forms.MenuItem();
+            this.menuItem2 = new System.Windows.Forms.MenuItem();
             this.mnuAbout = new System.Windows.Forms.MenuItem();
+            this.connectFourGameContainer = new ConnectFour.ConnectFourGameContainer();
             this.SuspendLayout();
             // 
             // mainMenu1
@@ -57,34 +57,11 @@
             this.mnuExit});
             this.menuItem1.Text = "File";
             // 
-            // menuItem2
-            // 
-            this.menuItem2.Index = 2;
-            this.menuItem2.MenuItems.AddRange(new System.Windows.Forms.MenuItem[] {
-            this.mnuAbout});
-            this.menuItem2.Text = "Help";
-            // 
-            // connectFourGameContainer
-            // 
-            this.connectFourGameContainer.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.connectFourGameContainer.Location = new System.Drawing.Point(0, 0);
-            this.connectFourGameContainer.Margin = new System.Windows.Forms.Padding(4);
-            this.connectFourGameContainer.Name = "connectFourGameContainer";
-            this.connectFourGameContainer.Size = new System.Drawing.Size(1326, 901);
-            this.connectFourGameContainer.TabIndex = 0;
-            this.connectFourGameContainer.Text = "connectFourGameContainer1";
-            // 
-            // menuItem3
-            // 
-            this.menuItem3.Index = 1;
-            this.menuItem3.MenuItems.AddRange(new System.Windows.Forms.MenuItem[] {
-            this.mnuMuteSoundEffects});
-            this.menuItem3.Text = "Settings";
-            // 
             // mnuNewGame
             // 
             this.mnuNewGame.Index = 0;
             this.mnuNewGame.Text = "New Game";
+            this.mnuNewGame.Click += new System.EventHandler(this.mnuNewGame_Click);
             // 
             // menuItem5
             // 
@@ -95,27 +72,54 @@
             // 
             this.mnuExit.Index = 2;
             this.mnuExit.Text = "Exit";
+            this.mnuExit.Click += new System.EventHandler(this.mnuExit_Click);
+            // 
+            // menuItem3
+            // 
+            this.menuItem3.Index = 1;
+            this.menuItem3.MenuItems.AddRange(new System.Windows.Forms.MenuItem[] {
+            this.mnuMuteSoundEffects});
+            this.menuItem3.Text = "Settings";
             // 
             // mnuMuteSoundEffects
             // 
             this.mnuMuteSoundEffects.Index = 0;
             this.mnuMuteSoundEffects.Text = "Mute Sound Effects";
+            this.mnuMuteSoundEffects.Click += new System.EventHandler(this.mnuMuteSoundEffects_Click);
+            // 
+            // menuItem2
+            // 
+            this.menuItem2.Index = 2;
+            this.menuItem2.MenuItems.AddRange(new System.Windows.Forms.MenuItem[] {
+            this.mnuAbout});
+            this.menuItem2.Text = "Help";
             // 
             // mnuAbout
             // 
             this.mnuAbout.Index = 0;
             this.mnuAbout.Text = "About";
+            this.mnuAbout.Click += new System.EventHandler(this.mnuAbout_Click);
+            // 
+            // connectFourGameContainer
+            // 
+            this.connectFourGameContainer.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.connectFourGameContainer.Location = new System.Drawing.Point(0, 0);
+            this.connectFourGameContainer.Margin = new System.Windows.Forms.Padding(4);
+            this.connectFourGameContainer.Name = "connectFourGameContainer";
+            this.connectFourGameContainer.Size = new System.Drawing.Size(1326, 831);
+            this.connectFourGameContainer.TabIndex = 0;
+            this.connectFourGameContainer.Text = "connectFourGameContainer1";
             // 
             // MainForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(11F, 24F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(1326, 901);
+            this.ClientSize = new System.Drawing.Size(1326, 831);
             this.Controls.Add(this.connectFourGameContainer);
             this.Margin = new System.Windows.Forms.Padding(4);
             this.Menu = this.mainMenu1;
             this.Name = "MainForm";
-            this.Text = "Connect Four - Version 1.0 | By: Darian Benam";
+            this.Text = "Connect Four | By: Darian Benam";
             this.ResumeLayout(false);
 
         }

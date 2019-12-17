@@ -12,6 +12,7 @@ namespace ConnectFour
     public partial class MainForm : Form
     {
         private const string FORM_TITLE = "Connect Four - By Darian Benam";
+
         public MainForm()
         {
             InitializeComponent();
@@ -20,10 +21,10 @@ namespace ConnectFour
 
         private void subscribeToEvents()
         {
-            connectFourGameContainer.OnColumnFull += ConnectFourGameContainer_OnColumnFull;
-            connectFourGameContainer.OnGameOver += ConnectFourGameContainer_OnGameFinished;
-            connectFourGameContainer.OnNewGame += ConnectFourGameContainer_OnNewGame;
-            connectFourGameContainer.OnPlayerTurnChange += ConnectFourGameContainer_OnPlayerTurnChange;
+            connectFourGameContainer.OnColumnFull += connectFourGameContainer_OnColumnFull;
+            connectFourGameContainer.OnGameOver += connectFourGameContainer_OnGameFinished;
+            connectFourGameContainer.OnNewGame += connectFourGameContainer_OnNewGame;
+            connectFourGameContainer.OnPlayerTurnChange += connectFourGameContainer_OnPlayerTurnChange;
         }
 
         private void updateTitleStatingTurn(bool isRedPlayerTurn)
@@ -35,12 +36,12 @@ namespace ConnectFour
             }
         }
 
-        private void ConnectFourGameContainer_OnNewGame(object sender, bool redPlayerTurn)
+        private void connectFourGameContainer_OnNewGame(object sender, bool redPlayerTurn)
         {
             updateTitleStatingTurn(redPlayerTurn);
         }
 
-        private void ConnectFourGameContainer_OnGameFinished(object sender, ConnectFourGameContainer.Result gameResult)
+        private void connectFourGameContainer_OnGameFinished(object sender, ConnectFourGameContainer.Result gameResult)
         {
             string resultText = "";
             switch (gameResult)
@@ -59,14 +60,41 @@ namespace ConnectFour
             this.Invoke(new Action(() => this.Text = FORM_TITLE + " | Game over! " + resultText));
         }
 
-        private void ConnectFourGameContainer_OnPlayerTurnChange(object sender, bool redPlayerTurn)
+        private void connectFourGameContainer_OnPlayerTurnChange(object sender, bool redPlayerTurn)
         {
             updateTitleStatingTurn(redPlayerTurn);
         }
 
-        private void ConnectFourGameContainer_OnColumnFull(object sender)
+        private void connectFourGameContainer_OnColumnFull(object sender)
         {
             MessageBox.Show("Uh-oh. The column you clicked on seems to be full. Please try a different column", "Yikes!", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+        }
+
+        private void mnuNewGame_Click(object sender, EventArgs e)
+        {
+            DialogResult msgConfirmResult = MessageBox.Show("Are you sure you want to start a new game?", "Confirm", MessageBoxButtons.YesNo, MessageBoxIcon.Question);
+
+            if (msgConfirmResult == DialogResult.Yes)
+            {
+                connectFourGameContainer.StartNewGame();
+            }
+        }
+
+        private void mnuExit_Click(object sender, EventArgs e)
+        {
+            Application.Exit();
+        }
+
+        private void mnuMuteSoundEffects_Click(object sender, EventArgs e)
+        {
+            mnuMuteSoundEffects.Checked = !mnuMuteSoundEffects.Checked;
+
+            connectFourGameContainer.ToggleSoundEffects(mnuMuteSoundEffects.Checked);
+        }
+
+        private void mnuAbout_Click(object sender, EventArgs e)
+        {
+            MessageBox.Show("Program Name: Connect Four\nBy: Darian Benam\nVersion 1.0", "About", MessageBoxButtons.OK, MessageBoxIcon.Information) ;
         }
     }
 }
