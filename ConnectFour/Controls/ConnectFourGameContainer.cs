@@ -9,7 +9,7 @@
 /*          computer is the yellow chip.                                          */
 /* Coder: Darian Benam                                                            */
 /* Coders GitHub: https://github.com/BeardedFish                                  */
-/* File Last Updated: Monday, December 16, 2019                                   */
+/* File Last Updated: Monday, December 17, 2019                                   */
 /*                                                                                */
 /* Sound Effects Credits:                                                         */
 /* - Pop Sound Effect - Mark DiAngelo (from https://www.soundbible.com)           */
@@ -762,9 +762,10 @@ namespace ConnectFour
             int lineThickness = 4; // The line thickness for the outlines of objects drawn on the game container, in pixels.
 
             // Draw game container background (blue gradient at 45 degree angle)
-            using (var br = new LinearGradientBrush(this.ClientRectangle, Color.FromArgb(3, 78, 146), Color.FromArgb(3, 5, 40), 45))
+            Rectangle backgroundBounds = new Rectangle(-2, -2, this.Width + 2, this.Height + 2);
+            using (var br = new LinearGradientBrush(backgroundBounds, Color.FromArgb(3, 78, 146), Color.FromArgb(3, 5, 40), 45))
             {
-                g.FillRectangle(br, this.ClientRectangle);
+                g.FillRectangle(br, backgroundBounds);
             }
 
             // Draw the table floor for the game board to stand on (/O_O)/ ~ |__|
