@@ -1,4 +1,23 @@
-﻿using System;
+﻿/**********************************************************************************/
+/*                                                                                */
+/* File Name: ConnectFourGameContainer.cs                                         */
+/* Purpose: This class file contains code for a Control object that is a full     */
+/*          working version of the classic game called Connect Four. The class    */
+/*          has game two modes. The first mode is real player versus real player, */
+/*          where two humans share the same pointing device. The other mode is    */
+/*          human versus computer, where the human is the red chip and the        */
+/*          computer is the yellow chip.                                          */
+/* Coder: Darian Benam                                                            */
+/* Coders GitHub: https://github.com/BeardedFish                                  */
+/* File Last Updated: Monday, December 16, 2019                                   */
+/*                                                                                */
+/* Sound Effects Credits:                                                         */
+/* - Pop Sound Effect - Mark DiAngelo (from https://www.soundbible.com)           */
+/* - Game Over Sound Effect - Mike Koenig (from https://www.soundbible.com)       */
+/*                                                                                */
+/**********************************************************************************/
+
+using System;
 using System.Drawing;
 using System.Drawing.Drawing2D;
 using System.Windows.Forms;
@@ -30,7 +49,7 @@ namespace ConnectFour
         public delegate void ChipPlacedHandler(object sender);
 
         /// <summary>
-        /// 
+        /// An event for when a game chip is placed in the game board.
         /// </summary>
         public event ChipPlacedHandler OnChipPlaced;
 
@@ -41,7 +60,7 @@ namespace ConnectFour
         public delegate void ColumnFullHandler(object sender);
 
         /// <summary>
-        /// 
+        /// An event for when a human player
         /// </summary>
         public event ColumnFullHandler OnColumnFull;
 
@@ -102,20 +121,20 @@ namespace ConnectFour
         /// <summary>
         /// The horizontal padding for the game board from the left and right walls of the game container.
         /// </summary>
-        private const int GAME_BOARD_X_PADDING = 175;
+        private int gameBoardXPadding;
 
         /// <summary>
         /// The vertical padding for the game board from the top and bottom walls of the game container.
         /// </summary>
-        private const int GAME_BOARD_Y_PADDING = 75;
+        private int gameBoardYPadding;
 
         /// <summary>
-        /// 
+        /// The width of a grid box for the game board.
         /// </summary>
         private int gridBoxWidth;
 
         /// <summary>
-        /// 
+        /// The height of a grid box for the game board.
         /// </summary>
         private int gridBoxHeight;
 
@@ -133,19 +152,19 @@ namespace ConnectFour
         private bool isOpponentIsComputer = true;
 
         /// <summary>
-        /// 
+        /// States whether or not the sound effects are muted in the game container.
         /// </summary>
-        private bool muteSoundEffects = false;
+        private bool isSoundMuted = false;
 
         /// <summary>
         /// States whether the Connect Four game is over or not (somebody won or it ended in a tie).
         /// </summary>
-        private bool gameOver = false;
+        private bool isGameOver = false;
 
         /// <summary>
         /// States whether it is the red players turn (true) or the yellow players turn (false).
         /// </summary>
-        private bool redPlayerTurn = true;
+        private bool isRedPlayerTurn = true;
 
         /// <summary>
         /// States the total number of times the red player has won.
@@ -186,34 +205,39 @@ namespace ConnectFour
             // Make the game container double buffered to remove flickering
             this.DoubleBuffered = true;
 
-            gridBoxWidth = (this.Width - GAME_BOARD_X_PADDING * 2) / TOTAL_COLUMNS;
-            gridBoxHeight = (this.Height - GAME_BOARD_Y_PADDING * 2) / TOTAL_ROWS;
+            gridBoxWidth = (this.Width - gameBoardXPadding * 2) / TOTAL_COLUMNS;
+            gridBoxHeight = (this.Height - gameBoardYPadding * 2) / TOTAL_ROWS;
 
             subscribeToEvents();
         }
 
         /// <summary>
-        /// 
+        /// Method that executes when the handle of the control is created.
         /// </summary>
-        /// <param name="e"></param>
+        /// <param name="e">The event arguments of the event.</param>
         protected override void OnHandleCreated(EventArgs e)
         {
-            StartNewGame();
+            StartNewGame(false);
         }
 
         /// <summary>
         /// Clears the Connect Four game board and starts a new game.
         /// </summary>
-        public void StartNewGame()
+        public void StartNewGame(bool resetPlayerScores)
         {
             // Reset some variables
-            gameOver = false;
+            isGameOver = false;
             winCoordinates = null;
 
             // Clear the game board
             clearGameBoard();
 
-            if (isOpponentIsComputer && !redPlayerTurn)
+            if (resetPlayerScores)
+            {
+                redPlayerWinTotal = yellowPlayerWinTotal = 0;
+            }
+
+            if (isOpponentIsComputer && !isRedPlayerTurn)
             {
                 makeComputerDoMove();
             }
@@ -221,16 +245,25 @@ namespace ConnectFour
             // Raise the event that a new game has started
             if (OnNewGame != null)
             {
-                OnNewGame(this, redPlayerTurn);
+                OnNewGame(this, isRedPlayerTurn);
             }
 
             // Repaint the game container
             this.Invalidate();
         }
 
-        public void ToggleSoundEffects(bool muteSound)
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="muteSound"></param>
+        public void MuteSound(bool muteSound)
         {
-            muteSoundEffects = muteSound;
+            isSoundMuted = muteSound;
+        }
+
+        public void ToggleOpponent(bool playAgainstComputer)
+        {
+            isOpponentIsComputer = playAgainstComputer;
         }
 
         /// <summary>
@@ -248,7 +281,7 @@ namespace ConnectFour
         /// <param name="soundResource">The UnmanagedMemoryStream object that contains the sound that should be played.</param>
         private void playSoundEffect(UnmanagedMemoryStream soundResource)
         {
-            if (muteSoundEffects)
+            if (isSoundMuted)
             {
                 return;
             }
@@ -287,7 +320,7 @@ namespace ConnectFour
                     switchTurns();
 
                     // Make the computer player make a move if it's their turn
-                    if (!redPlayerTurn && isOpponentIsComputer)
+                    if (!isRedPlayerTurn && isOpponentIsComputer)
                     {
                         makeComputerDoMove();
                     }
@@ -311,7 +344,7 @@ namespace ConnectFour
                     OnGameOver(this, gameResult);
                 }
 
-                gameOver = true;
+                isGameOver = true;
             }
         }
 
@@ -320,11 +353,11 @@ namespace ConnectFour
         /// </summary>
         private void switchTurns()
         {
-            redPlayerTurn = !redPlayerTurn;
+            isRedPlayerTurn = !isRedPlayerTurn;
 
-            if (OnPlayerTurnChange != null)
+            if (OnPlayerTurnChange != null) // Raise the event
             {
-                OnPlayerTurnChange(this, redPlayerTurn);
+                OnPlayerTurnChange(this, isRedPlayerTurn);
             }
         }
         
@@ -350,7 +383,7 @@ namespace ConnectFour
         private void placedGameChip(int col, int row)
         {
             // Place the respective chip based on whose turn it is
-            if (redPlayerTurn)
+            if (isRedPlayerTurn)
             {
                 gameBoardArray[row, col] = Chip.Red;
             }
@@ -359,8 +392,7 @@ namespace ConnectFour
                 gameBoardArray[row, col] = Chip.Yellow;
             }
 
-            // Raise the event
-            if (OnChipPlaced != null)
+            if (OnChipPlaced != null) // Raise the event
             {
                 OnChipPlaced(this);
             }
@@ -420,7 +452,8 @@ namespace ConnectFour
         }
 
         /// <summary>
-        /// 
+        /// Updates the 'winCoordinates' Point array with the locations of the 4 grid boxes on the
+        /// game board.
         /// </summary>
         /// <param name="x1"></param>
         /// <param name="y1"></param>
@@ -440,13 +473,17 @@ namespace ConnectFour
                 new Point(x4, y4)
             };
 
+            // Repaint the game container
             this.Invalidate();
         }
 
         /// <summary>
         /// 
         /// </summary>
-        /// <returns></returns>
+        /// <returns>
+        /// A Result enum that states whether the game is ongoing, red player won, yellow player won, or if
+        /// the game ended in a tie.
+        /// </returns>
         private Result getGameResult()
         {
             for (int row = 0; row < gameBoardArray.GetLength(0); row++)
@@ -560,7 +597,7 @@ namespace ConnectFour
         /// <param name="e"></param>
         protected override void OnMouseMove(MouseEventArgs e)
         {
-            int hoverColumn = (e.X - GAME_BOARD_X_PADDING) / gridBoxWidth;
+            int hoverColumn = (e.X - gameBoardXPadding) / gridBoxWidth;
 
             if (hoverColumn < 0)
             {
@@ -598,7 +635,7 @@ namespace ConnectFour
 
                 while (true)
                 {
-                    randColumn = random.Next(0, TOTAL_COLUMNS - 1);
+                    randColumn = random.Next(0, TOTAL_COLUMNS);
 
                     row = getRowToPlaceChip(randColumn);
 
@@ -617,13 +654,13 @@ namespace ConnectFour
         /// <param name="e">The mouse event arguments for when the game container is clicked.</param>
         protected override void OnMouseClick(MouseEventArgs e)
         {
-            if (gameOver)
+            if (isGameOver)
             {
-                StartNewGame();
+                StartNewGame(false);
             }
             else
             {
-                if (isOpponentIsComputer && !redPlayerTurn)
+                if (isOpponentIsComputer && !isRedPlayerTurn)
                 {
                     return;
                 }
@@ -649,9 +686,12 @@ namespace ConnectFour
         /// <param name="e">The event arguments when the game container is resized.</param>
         protected override void OnResize(EventArgs e)
         {
+            gameBoardXPadding = (int)(this.Width * 0.25);
+            gameBoardYPadding = (int)(this.Height * 0.15);
+
             // Update the grid box width and length
-            gridBoxWidth = (this.Width - GAME_BOARD_X_PADDING * 2) / TOTAL_COLUMNS;
-            gridBoxHeight = (this.Height - GAME_BOARD_Y_PADDING * 2) / TOTAL_ROWS;
+            gridBoxWidth = (this.Width - gameBoardXPadding * 2) / TOTAL_COLUMNS;
+            gridBoxHeight = (this.Height - gameBoardYPadding * 2) / TOTAL_ROWS;
 
             // Repaint the game container
             this.Invalidate();
@@ -667,30 +707,36 @@ namespace ConnectFour
         /// <param name="borderThickness">The thickness of the border for the chip.</param>
         private void drawChip(Graphics g, Chip chipType, int col, int row, int borderThickness)
         {
-            int chipPadding = 15; // The padding around the chip from the grid box it is in
+            int chipPaddingX = (int)(gridBoxWidth * 0.70); // The horizontal padding around the chip from the grid box it is in
+            int chipPaddingY = (int)(gridBoxHeight * 0.70); // The vertical padding around the chip from the grid box it is in
 
-            Rectangle chipRect = new Rectangle(GAME_BOARD_X_PADDING + (col * gridBoxWidth) + chipPadding,
-                            GAME_BOARD_Y_PADDING + row * gridBoxHeight + chipPadding,
-                            gridBoxWidth - (chipPadding * 2) + borderThickness,
-                            gridBoxHeight - (chipPadding * 2) + borderThickness);
+            Rectangle chipRect = new Rectangle(gameBoardXPadding + (col * gridBoxWidth) + chipPaddingX + borderThickness,
+                            gameBoardYPadding + row * gridBoxHeight + chipPaddingY + borderThickness,
+                            gridBoxWidth - (chipPaddingX * 2) - (borderThickness * 2),
+                            gridBoxHeight - (chipPaddingY * 2) - (borderThickness * 2));
+
+            if (chipRect.X == 0 || chipRect.Y == 0 || chipRect.Width == 0 || chipRect.Height == 0)
+            {
+                return;
+            }
 
             switch (chipType)
             {
                 default:
                 case Chip.Empty:
-                    using (var br = new LinearGradientBrush(chipRect, Color.FromArgb(255, 255, 255), Color.FromArgb(215, 215, 215), 90))
+                    using (var br = new LinearGradientBrush(chipRect, Color.FromArgb(215, 215, 215), Color.FromArgb(255, 255, 255), LinearGradientMode.Vertical))
                     {
                         g.FillEllipse(br, chipRect);
                     }
                     break;
                 case Chip.Red:
-                    using (var br = new LinearGradientBrush(chipRect, Color.FromArgb(245, 0, 0), Color.FromArgb(155, 0, 0), 90))
+                    using (var br = new LinearGradientBrush(chipRect, Color.FromArgb(155, 0, 0), Color.FromArgb(245, 0, 0), LinearGradientMode.Vertical))
                     {
                         g.FillEllipse(br, chipRect);
                     }
                     break;
                 case Chip.Yellow:
-                    using (var br = new LinearGradientBrush(chipRect, Color.FromArgb(227, 229, 123), Color.FromArgb(203, 197, 49), 90))
+                    using (var br = new LinearGradientBrush(chipRect, Color.FromArgb(203, 197, 49), Color.FromArgb(227, 229, 123), LinearGradientMode.Vertical))
                     {
                         g.FillEllipse(br, chipRect);
                     }
@@ -713,7 +759,7 @@ namespace ConnectFour
             Graphics g = e.Graphics;
             g.SmoothingMode = SmoothingMode.AntiAlias;
 
-            int lineThickness = 2; // The line thickness for the outlines of objects drawn on the game container, in pixels.
+            int lineThickness = 4; // The line thickness for the outlines of objects drawn on the game container, in pixels.
 
             // Draw game container background (blue gradient at 45 degree angle)
             using (var br = new LinearGradientBrush(this.ClientRectangle, Color.FromArgb(3, 78, 146), Color.FromArgb(3, 5, 40), 45))
@@ -731,8 +777,8 @@ namespace ConnectFour
                 Point[] floorPointsArray =
                 {
                     new Point(0, this.Height + lineThickness),
-                    new Point(tableXOffset, this.Height - GAME_BOARD_Y_PADDING - (gridBoxHeight / 2)),
-                    new Point(this.Width - tableXOffset, this.Height - GAME_BOARD_Y_PADDING - (gridBoxHeight / 2)),
+                    new Point(tableXOffset, this.Height - gameBoardYPadding - (gridBoxHeight / 2)),
+                    new Point(this.Width - tableXOffset, this.Height - gameBoardYPadding - (gridBoxHeight / 2)),
                     new Point(this.Width, this.Height + lineThickness)
                 };
 
@@ -747,7 +793,7 @@ namespace ConnectFour
             }
 
             // Draw the game board background (light blue gradient at a 90 degree angle)
-            Rectangle gameBoardRect = new Rectangle(GAME_BOARD_X_PADDING, GAME_BOARD_Y_PADDING, this.Width - GAME_BOARD_X_PADDING * 2, this.Height - GAME_BOARD_Y_PADDING * 2 - 2);
+            Rectangle gameBoardRect = new Rectangle(gameBoardXPadding, gameBoardYPadding, (gridBoxWidth * TOTAL_COLUMNS), (gridBoxHeight * TOTAL_ROWS));
             using (var br = new LinearGradientBrush(gameBoardRect, Color.FromArgb(64, 138, 196), Color.FromArgb(18, 82, 129), 90))
             {
                 g.FillRectangle(br, gameBoardRect);
@@ -758,8 +804,8 @@ namespace ConnectFour
             {
                 for (int i = 0; i < winCoordinates.Length; i++)
                 {
-                    Rectangle winRect = new Rectangle(GAME_BOARD_X_PADDING + winCoordinates[i].X * gridBoxWidth,
-                        GAME_BOARD_Y_PADDING + winCoordinates[i].Y * gridBoxHeight,
+                    Rectangle winRect = new Rectangle(gameBoardXPadding + winCoordinates[i].X * gridBoxWidth,
+                        gameBoardYPadding + winCoordinates[i].Y * gridBoxHeight,
                         gridBoxWidth,
                         gridBoxHeight);
 
@@ -774,16 +820,18 @@ namespace ConnectFour
             using (var pen = new Pen(Color.Black, lineThickness))
             {
                 // Draw horizontal grid lines
-                for (int i = 0; i <= TOTAL_ROWS; i++)
+                for (int i = 1; i < TOTAL_ROWS; i++)
                 {
-                    g.DrawLine(pen, GAME_BOARD_X_PADDING, GAME_BOARD_Y_PADDING + (i * gridBoxHeight), this.Width - GAME_BOARD_X_PADDING, GAME_BOARD_Y_PADDING + (i * gridBoxHeight));
+                    g.DrawLine(pen, gameBoardXPadding, gameBoardYPadding + (i * gridBoxHeight), gameBoardXPadding + (gridBoxWidth * TOTAL_COLUMNS), gameBoardYPadding + (i * gridBoxHeight));
                 } // End for
 
                 // Draw vertical grid lines
-                for (int i = 0; i <= TOTAL_COLUMNS; i++)
+                for (int i = 1; i < TOTAL_COLUMNS; i++)
                 {
-                    g.DrawLine(pen, GAME_BOARD_X_PADDING + (i * gridBoxWidth) + 1, GAME_BOARD_Y_PADDING, GAME_BOARD_X_PADDING + (i * gridBoxWidth) + 1, GAME_BOARD_Y_PADDING + (gridBoxHeight * TOTAL_ROWS));
+                    g.DrawLine(pen, gameBoardXPadding + (i * gridBoxWidth), gameBoardYPadding, gameBoardXPadding + (i * gridBoxWidth), gameBoardYPadding + (gridBoxHeight * TOTAL_ROWS));
                 } // End for
+
+                g.DrawRectangle(pen, gameBoardRect);
             }
 
             // Draw the chips (empty, red, or yellow)
@@ -796,32 +844,31 @@ namespace ConnectFour
             } // End outer for (rows)
 
             // Draw the hovering chip above the game board
-            if (!gameOver && !DesignMode)
+            if (!isGameOver && !DesignMode)
             {
-                Chip hoverChipType = redPlayerTurn ? Chip.Red : Chip.Yellow;
+                Chip hoverChipType = isRedPlayerTurn ? Chip.Red : Chip.Yellow;
 
                 if (isOpponentIsComputer)
                 {
-                    if (redPlayerTurn) // No need to draw the yellow chip if the opponent is a computer
+                    if (isRedPlayerTurn) // No need to draw the yellow chip if the opponent is a computer
                     {
                         // Fun fact: Since the game board is coordinate based, we can placed
-                        drawChip(g, hoverChipType, hoveredColumn, -1, 2);
+                        drawChip(g, hoverChipType, hoveredColumn, -1, lineThickness);
                     }
                 }
                 else
                 {
-                    drawChip(g, hoverChipType, hoveredColumn, -1, 2);
+                    drawChip(g, hoverChipType, hoveredColumn, -1, lineThickness);
                 }
             }
 
-            // Draw some text stating the game name, the version, and who the program was coded by (because Darian Benam is a super cool guy)
-            g.DrawString("Connect Four - Version 1.0 | By: Darian Benam", this.Font, Brushes.White, 5, 5);
-
             // Draw the total win scores for the player 1 (red) and player 2 (yellow):
-            StringFormat sf = new StringFormat();
-            sf.LineAlignment = StringAlignment.Center;
-            sf.Alignment = StringAlignment.Center;
-            g.DrawString(redPlayerWinTotal + " : " + yellowPlayerWinTotal, scoreFont, Brushes.White, new Rectangle(0, 0, this.Width, (this.Height * 2) - 48), sf);
+            using (StringFormat sf = new StringFormat())
+            {
+                sf.LineAlignment = StringAlignment.Center;
+                sf.Alignment = StringAlignment.Center;
+                g.DrawString(redPlayerWinTotal + " : " + yellowPlayerWinTotal, scoreFont, Brushes.White, new Rectangle(0, 0, this.Width, (this.Height * 2) - 48), sf);
+            }
         }
-    }
-}
+    } // End class
+} // End namespace
