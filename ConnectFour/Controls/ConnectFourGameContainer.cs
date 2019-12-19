@@ -9,7 +9,7 @@
 /*          computer is the yellow chip.                                          */
 /* Coder: Darian Benam                                                            */
 /* Coders GitHub: https://github.com/BeardedFish                                  */
-/* File Last Updated: Monday, December 17, 2019                                   */
+/* File Last Updated: Monday, December 18, 2019                                   */
 /*                                                                                */
 /* Sound Effects Credits:                                                         */
 /* - Pop Sound Effect - Mark DiAngelo (from https://www.soundbible.com)           */
@@ -23,34 +23,26 @@ using System.Drawing.Drawing2D;
 using System.Windows.Forms;
 using System.Threading;
 using System.Media;
-using ConnectFour.Properties;
 using System.IO;
+using ConnectFour.Properties;
 
 namespace ConnectFour
 {
     public class ConnectFourGameContainer : Control
     {
         /// <summary>
-        /// A delegate event handler for when the game is over.
+        /// A delegate event handler for when a player wins or when the game ends in a tie.
         /// </summary>
         /// <param name="sender">The object that raised the event.</param>
         /// <param name="gameResult">The result of the game after it ended.</param>
-        public delegate void GameFinishedHandler(object sender, Result gameResult);
-
-        /// <summary>
-        /// 
-        /// </summary>
-        public event GameFinishedHandler OnGameOver;
+        public delegate void OnGameOverHandler(object sender, Result gameResult);
+        public event OnGameOverHandler OnGameOver;
 
         /// <summary>
         /// A delegate event handler for when a chip in the game board.
         /// </summary>
         /// <param name="sender">The object that raised the event.</param>
         public delegate void ChipPlacedHandler(object sender);
-
-        /// <summary>
-        /// An event for when a game chip is placed in the game board.
-        /// </summary>
         public event ChipPlacedHandler OnChipPlaced;
 
         /// <summary>
@@ -58,10 +50,6 @@ namespace ConnectFour
         /// </summary>
         /// <param name="sender">The object that raised the event.</param>
         public delegate void ColumnFullHandler(object sender);
-
-        /// <summary>
-        /// An event for when a human player
-        /// </summary>
         public event ColumnFullHandler OnColumnFull;
 
         /// <summary>
@@ -69,10 +57,6 @@ namespace ConnectFour
         /// </summary>
         /// <param name="sender">The object that raised the event.</param>
         public delegate void PlayerTurnChangedHandler(object sender, bool redPlayerTurn);
-
-        /// <summary>
-        /// 
-        /// </summary>
         public event PlayerTurnChangedHandler OnPlayerTurnChange;
 
         /// <summary>
@@ -81,10 +65,6 @@ namespace ConnectFour
         /// <param name="sender"></param>
         /// <param name="redPlayerTurn"></param>
         public delegate void NewGameHandler(object sender, bool redPlayerTurn);
-
-        /// <summary>
-        /// 
-        /// </summary>
         public event NewGameHandler OnNewGame;
 
         /// <summary>
@@ -164,7 +144,7 @@ namespace ConnectFour
         /// <summary>
         /// States whether it is the red players turn (true) or the yellow players turn (false).
         /// </summary>
-        private bool isRedPlayerTurn = true;
+        private bool isRedPlayerTurn = false;
 
         /// <summary>
         /// States the total number of times the red player has won.
@@ -178,17 +158,12 @@ namespace ConnectFour
 
         /// <summary>
         /// An 2-dimensional array that represents the Connect Four board. By default, every element inside
-        /// this array should be set to empty.
+        /// this array will be set to empty.
         /// </summary>
         private Chip[,] gameBoardArray = new Chip[TOTAL_ROWS, TOTAL_COLUMNS];
 
         /// <summary>
-        /// 
-        /// </summary>
-        private Font scoreFont = new Font("Arial", 12, FontStyle.Regular);
-
-        /// <summary>
-        /// An array of points that states where a player has won the game (4 chips in a row).
+        /// An array of points that states where a player has won the game (4 chips in a row of the same type).
         /// </summary>
         private Point[] winCoordinates;
 
@@ -205,19 +180,11 @@ namespace ConnectFour
             // Make the game container double buffered to remove flickering
             this.DoubleBuffered = true;
 
-            gridBoxWidth = (this.Width - gameBoardXPadding * 2) / TOTAL_COLUMNS;
-            gridBoxHeight = (this.Height - gameBoardYPadding * 2) / TOTAL_ROWS;
+            // Calculate and update the grid box width and height for the game board
+            UpdateGridBoxDimensions();
 
-            subscribeToEvents();
-        }
-
-        /// <summary>
-        /// Method that executes when the handle of the control is created.
-        /// </summary>
-        /// <param name="e">The event arguments of the event.</param>
-        protected override void OnHandleCreated(EventArgs e)
-        {
-            StartNewGame(false);
+            // Subscribe to evens that the game container needs
+            SubscribeToEvents();
         }
 
         /// <summary>
@@ -230,16 +197,19 @@ namespace ConnectFour
             winCoordinates = null;
 
             // Clear the game board
-            clearGameBoard();
+            ClearGameBoard();
+
+            SwitchTurn();
 
             if (resetPlayerScores)
             {
                 redPlayerWinTotal = yellowPlayerWinTotal = 0;
             }
 
+            // Make the opponent do a move if it's their turn when a new game starts
             if (isOpponentIsComputer && !isRedPlayerTurn)
             {
-                makeComputerDoMove();
+                MakeComputerDoMove();
             }
 
             // Raise the event that a new game has started
@@ -253,33 +223,47 @@ namespace ConnectFour
         }
 
         /// <summary>
-        /// 
+        /// Toggles the setting that states whether the sound in the game container is muted or not.
         /// </summary>
-        /// <param name="muteSound"></param>
-        public void MuteSound(bool muteSound)
+        /// <param name="muteSound">States whether the sound should be muted or not.</param>
+        public void ToggleSound(bool muteSound)
         {
             isSoundMuted = muteSound;
         }
 
-        public void ToggleOpponent(bool playAgainstComputer)
+        /// <summary>
+        /// Toggles the setting that states whether the yellow player is a computer or not.
+        /// </summary>
+        /// <param name="isComputer">States whether the yellow player should be a computer player or not.</param>
+        public void ToggleComputerOpponent(bool isComputer)
         {
-            isOpponentIsComputer = playAgainstComputer;
+            isOpponentIsComputer = isComputer;
         }
 
         /// <summary>
-        /// Subscribes to some events that the game container has.
+        /// Updates the 'gridBoxWidth' and 'gridBoxHeight' variables that contains the width and height of a grid box
+        /// for the Connect Four game board.
         /// </summary>
-        private void subscribeToEvents()
+        private void UpdateGridBoxDimensions()
+        {
+            gridBoxWidth = (this.Width - gameBoardXPadding * 2) / TOTAL_COLUMNS;
+            gridBoxHeight = (this.Height - gameBoardYPadding * 2) / TOTAL_ROWS;
+        }
+
+        /// <summary>
+        /// Subscribes to some events that the game container needs in order to function.
+        /// </summary>
+        private void SubscribeToEvents()
         {
             this.OnChipPlaced += ConnectFourGameContainer_OnChipPlaced;
-            this.OnGameOver += ConnectFourGameContainer_OnGameFinished;
+            this.OnGameOver += ConnectFourGameContainer_OnGameOver;
         }
 
         /// <summary>
         /// Plays a sound effect contained in a UnmanagedMemoryStream object.
         /// </summary>
         /// <param name="soundResource">The UnmanagedMemoryStream object that contains the sound that should be played.</param>
-        private void playSoundEffect(UnmanagedMemoryStream soundResource)
+        private void PlaySoundEffect(UnmanagedMemoryStream soundResource)
         {
             if (isSoundMuted)
             {
@@ -293,36 +277,36 @@ namespace ConnectFour
         }
 
         /// <summary>
-        /// 
+        /// Event handler for when the game is over from either when someone wins or it ends in a tie.
         /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="gameResult"></param>
-        private void ConnectFourGameContainer_OnGameFinished(object sender, Result gameResult)
+        /// <param name="sender">The object that raised the event.</param>
+        /// <param name="gameResult">The final result of the game when it ended (red player won, yellow player won, or tie).</param>
+        private void ConnectFourGameContainer_OnGameOver(object sender, Result gameResult)
         {
             // Play the game over sound effect
-            playSoundEffect(Resources.Game_Over_Sound_Effect);
+            PlaySoundEffect(Resources.Game_Over_Sound_Effect);
         }
 
         /// <summary>
-        /// 
+        /// Event handler for when a game chip is placed on the board.
         /// </summary>
         /// <param name="sender">The object that raised the event.</param>
         private void ConnectFourGameContainer_OnChipPlaced(object sender)
         {
             // Play the pop sound effect
-            playSoundEffect(Resources.Pop_Sound_Effect);
+            PlaySoundEffect(Resources.Pop_Sound_Effect);
 
             // Check the game outcome to see if there is a winner
             Result gameResult = getGameResult();
             switch (gameResult)
             {
                 case Result.OngoingGame:
-                    switchTurns();
+                    SwitchTurn();
 
                     // Make the computer player make a move if it's their turn
                     if (!isRedPlayerTurn && isOpponentIsComputer)
                     {
-                        makeComputerDoMove();
+                        MakeComputerDoMove();
                     }
                     break;
                 case Result.RedPlayerWins:
@@ -339,19 +323,19 @@ namespace ConnectFour
 
             if (gameResult != Result.OngoingGame) // If this evaluates true then that means the game is over
             {
-                if (OnGameOver != null)
+                isGameOver = true;
+
+                if (OnGameOver != null) // Raise the event
                 {
                     OnGameOver(this, gameResult);
                 }
-
-                isGameOver = true;
             }
         }
 
         /// <summary>
-        /// 
+        /// Switches turn to give the other player the ability to place their piece on the game board.
         /// </summary>
-        private void switchTurns()
+        private void SwitchTurn()
         {
             isRedPlayerTurn = !isRedPlayerTurn;
 
@@ -364,7 +348,7 @@ namespace ConnectFour
         /// <summary>
         /// Clears the Connect Four game board and sets each grid square to empty.
         /// </summary>
-        private void clearGameBoard()
+        private void ClearGameBoard()
         {
             for (int row = 0; row < gameBoardArray.GetLength(0); row++)
             {
@@ -380,7 +364,7 @@ namespace ConnectFour
         /// </summary>
         /// <param name="col">The column to place the chip in.</param>
         /// <param name="row">The row to place the chip in.</param>
-        private void placedGameChip(int col, int row)
+        private void PlaceGameChip(int col, int row)
         {
             // Place the respective chip based on whose turn it is
             if (isRedPlayerTurn)
@@ -408,7 +392,7 @@ namespace ConnectFour
         /// <returns>Either -1 which means the column is full or a number that represents a row number index 
         /// for the 'gameBoardArray' array.
         /// </returns>
-        private int getRowToPlaceChip(int col)
+        private int GetRowToPlaceChip(int col)
         {
             int startRow = TOTAL_ROWS - 1;
 
@@ -428,10 +412,12 @@ namespace ConnectFour
         /// either 
         /// </summary>
         /// <returns>A boolean that states whether the game board grid is filled or not.</returns>
-        private bool isGridFilled()
+        private bool IsGridFilled()
         {
             int sum = 0;
 
+            // Add 1 to sum for every time it fines a grid square that is not equal to
+            // an empty chip
             for (int row = 0; row < gameBoardArray.GetLength(0); row++)
             {
                 for (int col = 0; col < gameBoardArray.GetLength(1); col++)
@@ -452,26 +438,16 @@ namespace ConnectFour
         }
 
         /// <summary>
-        /// Updates the 'winCoordinates' Point array with the locations of the 4 grid boxes on the
+        /// Updates the 'winCoordinates' array of type Point with the locations of the 4 grid boxes on the
         /// game board.
         /// </summary>
-        /// <param name="x1"></param>
-        /// <param name="y1"></param>
-        /// <param name="x2"></param>
-        /// <param name="y2"></param>
-        /// <param name="x3"></param>
-        /// <param name="y3"></param>
-        /// <param name="x4"></param>
-        /// <param name="y4"></param>
-        private void updateWinCoordinates(int x1, int y1, int x2, int y2, int x3, int y3, int x4, int y4)
+        /// <param name="point1">Column #1 of winning grid block.</param>
+        /// <param name="point2">Column #1 of winning grid block.</param>
+        /// <param name="point3">Column #1 of winning grid block.</param>
+        /// <param name="point4">Column #1 of winning grid block.</param>
+        private void updateWinCoordinates(Point point1, Point point2, Point point3, Point point4)
         {
-            winCoordinates = new Point[]
-            {
-                new Point(x1, y1),
-                new Point(x2, y2),
-                new Point(x3, y3),
-                new Point(x4, y4)
-            };
+            winCoordinates = new Point[] { point1, point2, point3, point4 };
 
             // Repaint the game container
             this.Invalidate();
@@ -486,6 +462,18 @@ namespace ConnectFour
         /// </returns>
         private Result getGameResult()
         {
+            /*
+             * Check horizontally for win.
+             * 
+             * Example of a possible horizontal win:
+             *  0  1  2  3  4  5  6
+             * [X][X][X][X][ ][ ][ ] 0
+             * [ ][ ][ ][ ][ ][ ][ ] 1
+             * [ ][ ][ ][ ][ ][ ][ ] 2
+             * [ ][ ][ ][ ][ ][ ][ ] 3
+             * [ ][ ][ ][ ][ ][ ][ ] 4
+             * [ ][ ][ ][ ][ ][ ][ ] 5
+             */
             for (int row = 0; row < gameBoardArray.GetLength(0); row++)
             {
                 for (int col = 0; col < gameBoardArray.GetLength(1) - 3; col++)
@@ -495,7 +483,7 @@ namespace ConnectFour
                         && gameBoardArray[row, col + 2] == Chip.Red
                         && gameBoardArray[row, col + 3] == Chip.Red)
                     {
-                        updateWinCoordinates(col, row, col + 1, row, col + 2, row, col + 3, row);
+                        updateWinCoordinates(new Point(col, row), new Point(col + 1, row), new Point(col + 2, row), new Point(col + 3, row));
                         return Result.RedPlayerWins;
                     }
 
@@ -504,13 +492,24 @@ namespace ConnectFour
                          && gameBoardArray[row, col + 2] == Chip.Yellow
                          && gameBoardArray[row, col + 3] == Chip.Yellow)
                     {
-                        updateWinCoordinates(col, row, col + 1, row, col + 2, row, col + 3, row);
-                        this.Invalidate();
+                        updateWinCoordinates(new Point(col, row), new Point(col + 1, row), new Point(col + 2, row), new Point(col + 3, row));
                         return Result.YellowPlayerWins;
                     }
                 } // End inner for (columns)
             } // End outer for (rows)
 
+            /*
+             * Check vertically for win.
+             * 
+             * Example of a possible vertical win:
+             *  0  1  2  3  4  5  6
+             * [X][ ][ ][ ][ ][ ][ ] 0
+             * [X][ ][ ][ ][ ][ ][ ] 1
+             * [X][ ][ ][ ][ ][ ][ ] 2
+             * [X][ ][ ][ ][ ][ ][ ] 3
+             * [ ][ ][ ][ ][ ][ ][ ] 4
+             * [ ][ ][ ][ ][ ][ ][ ] 5
+             */
             for (int row = 0; row < gameBoardArray.GetLength(0) - 3; row++)
             {
                 for (int col = 0; col < gameBoardArray.GetLength(1); col++)
@@ -520,7 +519,7 @@ namespace ConnectFour
                         && gameBoardArray[row + 2, col] == Chip.Red
                         && gameBoardArray[row + 3, col] == Chip.Red)
                     {
-                        updateWinCoordinates(col, row, col, row + 1, col, row + 2, col, row + 3);
+                        updateWinCoordinates(new Point(col, row), new Point(col, row + 1), new Point(col, row + 2), new Point(col, row + 3));
                         return Result.RedPlayerWins;
                     }
 
@@ -529,12 +528,24 @@ namespace ConnectFour
                         && gameBoardArray[row + 2, col] == Chip.Yellow
                         && gameBoardArray[row + 3, col] == Chip.Yellow)
                     {
-                        updateWinCoordinates(col, row, col, row + 1, col, row + 2, col, row + 3);
+                        updateWinCoordinates(new Point(col, row), new Point(col, row + 1), new Point(col, row + 2), new Point(col, row + 3));
                         return Result.YellowPlayerWins;
                     }
                 } // End inner for (columns)
             } // End outer for (rows)
 
+            /*
+             * Check diagonally (negative slope) for win.
+             * 
+             * Example of a possible diagonal (negative slope) win:
+             *  0  1  2  3  4  5  6
+             * [X][ ][ ][ ][ ][ ][ ] 0
+             * [ ][X][ ][ ][ ][ ][ ] 1
+             * [ ][ ][X][ ][ ][ ][ ] 2
+             * [ ][ ][ ][X][ ][ ][ ] 3
+             * [ ][ ][ ][ ][ ][ ][ ] 4
+             * [ ][ ][ ][ ][ ][ ][ ] 5
+             */
             for (int row = 0; row < gameBoardArray.GetLength(0) - 3; row++)
             {
                 for (int col = 0; col < gameBoardArray.GetLength(1) - 3; col++)
@@ -544,7 +555,7 @@ namespace ConnectFour
                         && gameBoardArray[row + 2, col + 2] == Chip.Red
                         && gameBoardArray[row + 3, col + 3] == Chip.Red)
                     {
-                        updateWinCoordinates(col, row, col + 1, row + 1, col + 2, row + 2, col + 3, row + 3);
+                        updateWinCoordinates(new Point(col, row), new Point(col + 1, row + 1), new Point(col + 2, row + 2), new Point(col + 3, row + 3));
                         return Result.RedPlayerWins;
                     }
 
@@ -553,12 +564,24 @@ namespace ConnectFour
                         && gameBoardArray[row + 2, col + 2] == Chip.Yellow
                         && gameBoardArray[row + 3, col + 3] == Chip.Yellow)
                     {
-                        updateWinCoordinates(col, row, col + 1, row + 1, col + 2, row + 2, col + 3, row + 3);
+                        updateWinCoordinates(new Point(col, row), new Point(col + 1, row + 1), new Point(col + 2, row + 2), new Point(col + 3, row + 3));
                         return Result.YellowPlayerWins;
                     }
                 } // End inner for (columns)
             } // End outer for (rows)
 
+            /*
+             * Check diagonally (positive slope) for win.
+             * 
+             * Example of a possible diagonal (positive slope) win:
+             *  0  1  2  3  4  5  6
+             * [ ][ ][ ][ ][ ][ ][X] 0
+             * [ ][ ][ ][ ][ ][X][ ] 1
+             * [ ][ ][ ][ ][X][ ][ ] 2
+             * [ ][ ][ ][X][ ][ ][ ] 3
+             * [ ][ ][ ][ ][ ][ ][ ] 4
+             * [ ][ ][ ][ ][ ][ ][ ] 5
+             */
             for (int row = 0; row < gameBoardArray.GetLength(0) - 3; row++)
             {
                 for (int col = gameBoardArray.GetLength(1) - 1; col >= 3; col--)
@@ -568,7 +591,7 @@ namespace ConnectFour
                         && gameBoardArray[row + 2, col - 2] == Chip.Red
                         && gameBoardArray[row + 3, col - 3] == Chip.Red)
                     {
-                        updateWinCoordinates(col, row, col - 1, row + 1, col - 2, row + 2, col - 3, row + 3);
+                        updateWinCoordinates(new Point(col, row), new Point(col - 1, row + 1), new Point(col - 2, row + 2), new Point(col - 3, row + 3));
                         return Result.RedPlayerWins;
                     }
 
@@ -577,13 +600,13 @@ namespace ConnectFour
                         && gameBoardArray[row + 2, col - 2] == Chip.Yellow
                         && gameBoardArray[row + 3, col - 3] == Chip.Yellow)
                     {
-                        updateWinCoordinates(col, row, col - 1, row + 1, col - 2, row + 2, col - 3, row + 3);
+                        updateWinCoordinates(new Point(col, row), new Point(col - 1, row + 1), new Point(col - 2, row + 2), new Point(col - 3, row + 3));
                         return Result.YellowPlayerWins;
                     }
                 } // End inner for (columns)
             } // End outer for (rows)
 
-            if (isGridFilled())
+            if (IsGridFilled())
             {
                 return Result.TiedGame;
             }
@@ -592,33 +615,16 @@ namespace ConnectFour
         }
 
         /// <summary>
+        /// Makes the computer player make a move by generating a random number from 0 to TOTAL_COLUMNS - 1. The random
+        /// number represents a column to place the computers game chip in. If that column is not full, the computer drops
+        /// their game chip (yellow) in that column.
         /// 
+        /// NOTE: This computer player is not the best. Will probably refactor this to make the AI make a move based on the
+        /// Minimax algorithm (https://en.wikipedia.org/wiki/Minimax).
         /// </summary>
-        /// <param name="e"></param>
-        protected override void OnMouseMove(MouseEventArgs e)
+        private void MakeComputerDoMove()
         {
-            int hoverColumn = (e.X - gameBoardXPadding) / gridBoxWidth;
-
-            if (hoverColumn < 0)
-            {
-                hoverColumn = 0;
-            }
-
-            if (hoverColumn >= TOTAL_COLUMNS)
-            {
-                hoverColumn = TOTAL_COLUMNS - 1;
-            }
-
-            if (hoveredColumn != hoverColumn)
-            {
-                hoveredColumn = hoverColumn;
-                this.Invalidate();
-            }
-        }
-
-        private void makeComputerDoMove()
-        {
-            // NOTE: Only reason we making the computer make a move on a new thread is because we are delaying
+            // NOTE: Only reason we are making the computer make a move on a new thread is because we are delaying
             //       the chip placement from around 500 ms to 1500 ms in order to simulate the opponent player
             //       "thinking." In order to delay, we use the Thread.Sleep() method, however, if we don't do
             //       this on a separate thread then the main thread will hang, causing the program to freeze
@@ -631,21 +637,130 @@ namespace ConnectFour
                 Thread.Sleep(random.Next(500, 1500));
 
                 int randColumn;
-                int row;
+                int randRow;
 
                 while (true)
                 {
                     randColumn = random.Next(0, TOTAL_COLUMNS);
+                    randRow = GetRowToPlaceChip(randColumn);
 
-                    row = getRowToPlaceChip(randColumn);
-
-                    if (row != -1) // Only place a game chip in an empty column/row.
+                    if (randRow != -1) // Only place a game chip in an empty column/row.
                     {
-                        placedGameChip(randColumn, row);
+                        PlaceGameChip(randColumn, randRow);
                         break;
                     }
                 } // End while
             }).Start();
+        }
+
+        /// <summary>
+        /// Draws a game chip at a certain grid location in the game board.
+        /// </summary>
+        /// <param name="g">The graphics object to be used for drawing the chip.</param>
+        /// <param name="chipType">The chip type to be drawn onto the game container.</param>
+        /// <param name="col">The column of where the chip should be drawn.</param>
+        /// <param name="row">The row of where the chip should be drawn.</param>
+        /// <param name="borderThickness">The thickness of the border for the chip.</param>
+        private void drawChipAtGridLocation(Graphics g, Chip chipType, int col, int row, int borderThickness)
+        {
+            int chipPaddingX = (int)(gridBoxWidth * 0.70); // The horizontal padding around the chip from the grid box it is in
+            int chipPaddingY = (int)(gridBoxHeight * 0.70); // The vertical padding around the chip from the grid box it is in
+
+            Rectangle chipBounds = new Rectangle(gameBoardXPadding + (col * gridBoxWidth) + chipPaddingX + borderThickness,
+                            gameBoardYPadding + row * gridBoxHeight + chipPaddingY + borderThickness,
+                            gridBoxWidth - (chipPaddingX * 2) - (borderThickness * 2),
+                            gridBoxHeight - (chipPaddingY * 2) - (borderThickness * 2));
+
+            if (chipBounds.X == 0 || chipBounds.Y == 0 || chipBounds.Width == 0 || chipBounds.Height == 0)
+            {
+                return;
+            }
+
+            // Define two color variables that will be combined to create a gradient for the game chip filling
+            Color topColor;
+            Color bottomColor;
+
+            switch (chipType) // Assign the colors based on the chip type
+            {
+                default:
+                case Chip.Empty:
+                    topColor = Color.FromArgb(215, 215, 215);
+                    bottomColor = Color.FromArgb(255, 255, 255);
+                    break;
+                case Chip.Red:
+                    topColor = Color.FromArgb(155, 0, 0);
+                    bottomColor = Color.FromArgb(245, 0, 0);
+                    break;
+                case Chip.Yellow:
+                    topColor = Color.FromArgb(203, 197, 49);
+                    bottomColor = Color.FromArgb(227, 229, 123);
+                    break;
+            }
+
+            // Draw gradient filling and border of the game chip
+            using (var br = new LinearGradientBrush(chipBounds, topColor, bottomColor, LinearGradientMode.Vertical))
+            {
+                g.FillEllipse(br, chipBounds);
+
+                using (var pen = new Pen(Color.Black, borderThickness))
+                {
+                    g.DrawEllipse(pen, chipBounds);
+                }
+            }
+        }
+
+        /// <summary>
+        /// Method that executes when the handle of the control is created.
+        /// </summary>
+        /// <param name="e">The event arguments of the event.</param>
+        protected override void OnHandleCreated(EventArgs e)
+        {
+            StartNewGame(false);
+        }
+
+        /// <summary>
+        /// Any time the game container is resized is handled here.
+        /// </summary>
+        /// <param name="e">The event arguments when the game container is resized.</param>
+        protected override void OnResize(EventArgs e)
+        {
+            // Update the horizonal and vertical padding for the game board
+            gameBoardXPadding = (int)(this.Width * 0.25);
+            gameBoardYPadding = (int)(this.Height * 0.15);
+
+            // Update the grid box width and length
+            UpdateGridBoxDimensions();
+
+            // Repaint the game container
+            this.Invalidate();
+        }
+
+        /// <summary>
+        /// Any time the mouse cursor moves on the game container is handled here.
+        /// </summary>
+        /// <param name="e">The mouse event arguments for when the mouse is moved.</param>
+        protected override void OnMouseMove(MouseEventArgs e)
+        {
+            // Calculate the column the cursor is currently hovering over
+            int hoverColumn = (e.X - gameBoardXPadding) / gridBoxWidth;
+
+            // Set hover column to 0 if it is out of bounds (left side)
+            if (hoverColumn < 0)
+            {
+                hoverColumn = 0;
+            }
+
+            // Set hover column to the last column if it is out of bounds (right side)
+            if (hoverColumn >= TOTAL_COLUMNS)
+            {
+                hoverColumn = TOTAL_COLUMNS - 1;
+            }
+
+            if (hoveredColumn != hoverColumn)
+            {
+                hoveredColumn = hoverColumn;
+                this.Invalidate();
+            }
         }
 
         /// <summary>
@@ -665,88 +780,18 @@ namespace ConnectFour
                     return;
                 }
 
-                int row = getRowToPlaceChip(hoveredColumn);
+                int row = GetRowToPlaceChip(hoveredColumn);
                 if (row != -1) // Not equal to -1 means that the column is not full
                 {
-                    placedGameChip(hoveredColumn, row);
+                    PlaceGameChip(hoveredColumn, row);
                 }
                 else // The column is full
                 {
-                    if (OnColumnFull != null)
+                    if (OnColumnFull != null)  // Raise the event
                     {
                         OnColumnFull(this);
                     }
                 }
-            }
-        }
-
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="e">The event arguments when the game container is resized.</param>
-        protected override void OnResize(EventArgs e)
-        {
-            gameBoardXPadding = (int)(this.Width * 0.25);
-            gameBoardYPadding = (int)(this.Height * 0.15);
-
-            // Update the grid box width and length
-            gridBoxWidth = (this.Width - gameBoardXPadding * 2) / TOTAL_COLUMNS;
-            gridBoxHeight = (this.Height - gameBoardYPadding * 2) / TOTAL_ROWS;
-
-            // Repaint the game container
-            this.Invalidate();
-        }
-
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="g">The graphics object to be used for drawing the chip.</param>
-        /// <param name="chipType">The chip type to be drawn onto the game container.</param>
-        /// <param name="col">The column of where the chip should be drawn.</param>
-        /// <param name="row">The row of where the chip should be drawn.</param>
-        /// <param name="borderThickness">The thickness of the border for the chip.</param>
-        private void drawChip(Graphics g, Chip chipType, int col, int row, int borderThickness)
-        {
-            int chipPaddingX = (int)(gridBoxWidth * 0.70); // The horizontal padding around the chip from the grid box it is in
-            int chipPaddingY = (int)(gridBoxHeight * 0.70); // The vertical padding around the chip from the grid box it is in
-
-            Rectangle chipRect = new Rectangle(gameBoardXPadding + (col * gridBoxWidth) + chipPaddingX + borderThickness,
-                            gameBoardYPadding + row * gridBoxHeight + chipPaddingY + borderThickness,
-                            gridBoxWidth - (chipPaddingX * 2) - (borderThickness * 2),
-                            gridBoxHeight - (chipPaddingY * 2) - (borderThickness * 2));
-
-            if (chipRect.X == 0 || chipRect.Y == 0 || chipRect.Width == 0 || chipRect.Height == 0)
-            {
-                return;
-            }
-
-            switch (chipType)
-            {
-                default:
-                case Chip.Empty:
-                    using (var br = new LinearGradientBrush(chipRect, Color.FromArgb(215, 215, 215), Color.FromArgb(255, 255, 255), LinearGradientMode.Vertical))
-                    {
-                        g.FillEllipse(br, chipRect);
-                    }
-                    break;
-                case Chip.Red:
-                    using (var br = new LinearGradientBrush(chipRect, Color.FromArgb(155, 0, 0), Color.FromArgb(245, 0, 0), LinearGradientMode.Vertical))
-                    {
-                        g.FillEllipse(br, chipRect);
-                    }
-                    break;
-                case Chip.Yellow:
-                    using (var br = new LinearGradientBrush(chipRect, Color.FromArgb(203, 197, 49), Color.FromArgb(227, 229, 123), LinearGradientMode.Vertical))
-                    {
-                        g.FillEllipse(br, chipRect);
-                    }
-                    break;
-            }
-
-            // Draw the border of the game chip
-            using (var pen = new Pen(Color.Black, borderThickness))
-            {
-                g.DrawEllipse(pen, chipRect);
             }
         }
 
@@ -794,10 +839,10 @@ namespace ConnectFour
             }
 
             // Draw the game board background (light blue gradient at a 90 degree angle)
-            Rectangle gameBoardRect = new Rectangle(gameBoardXPadding, gameBoardYPadding, (gridBoxWidth * TOTAL_COLUMNS), (gridBoxHeight * TOTAL_ROWS));
-            using (var br = new LinearGradientBrush(gameBoardRect, Color.FromArgb(64, 138, 196), Color.FromArgb(18, 82, 129), 90))
+            Rectangle gameBoardBounds = new Rectangle(gameBoardXPadding, gameBoardYPadding, (gridBoxWidth * TOTAL_COLUMNS), (gridBoxHeight * TOTAL_ROWS));
+            using (var br = new LinearGradientBrush(gameBoardBounds, Color.FromArgb(64, 138, 196), Color.FromArgb(18, 82, 129), 90))
             {
-                g.FillRectangle(br, gameBoardRect);
+                g.FillRectangle(br, gameBoardBounds);
             }
 
             // Draw a green background behind the winning chips
@@ -805,14 +850,14 @@ namespace ConnectFour
             {
                 for (int i = 0; i < winCoordinates.Length; i++)
                 {
-                    Rectangle winRect = new Rectangle(gameBoardXPadding + winCoordinates[i].X * gridBoxWidth,
+                    Rectangle winGridBoxBounds = new Rectangle(gameBoardXPadding + winCoordinates[i].X * gridBoxWidth,
                         gameBoardYPadding + winCoordinates[i].Y * gridBoxHeight,
                         gridBoxWidth,
                         gridBoxHeight);
 
-                    using (var br = new LinearGradientBrush(winRect, Color.FromArgb(168, 224, 99), Color.FromArgb(86, 171, 47), 90))
+                    using (var br = new LinearGradientBrush(winGridBoxBounds, Color.FromArgb(168, 224, 99), Color.FromArgb(86, 171, 47), 90))
                     {
-                        g.FillRectangle(br, winRect);
+                        g.FillRectangle(br, winGridBoxBounds);
                     }
                 } // End for
             }
@@ -832,7 +877,7 @@ namespace ConnectFour
                     g.DrawLine(pen, gameBoardXPadding + (i * gridBoxWidth), gameBoardYPadding, gameBoardXPadding + (i * gridBoxWidth), gameBoardYPadding + (gridBoxHeight * TOTAL_ROWS));
                 } // End for
 
-                g.DrawRectangle(pen, gameBoardRect);
+                g.DrawRectangle(pen, gameBoardBounds);
             }
 
             // Draw the chips (empty, red, or yellow)
@@ -840,7 +885,7 @@ namespace ConnectFour
             {
                 for (int col = 0; col < gameBoardArray.GetLength(1); col++)
                 {
-                    drawChip(g, gameBoardArray[row, col], col, row, lineThickness);
+                    drawChipAtGridLocation(g, gameBoardArray[row, col], col, row, lineThickness);
                 } // End inner for (columns)
             } // End outer for (rows)
 
@@ -853,22 +898,38 @@ namespace ConnectFour
                 {
                     if (isRedPlayerTurn) // No need to draw the yellow chip if the opponent is a computer
                     {
-                        // Fun fact: Since the game board is coordinate based, we can placed
-                        drawChip(g, hoverChipType, hoveredColumn, -1, lineThickness);
+                        // Fun fact: Since the game board is coordinate based, negative coordinates
+                        // (or coordinates greater than the TOTAL_COLUMNS - 1 or TOTAL_ROWS - 1) places 
+                        // chips outside of the game board.
+                        drawChipAtGridLocation(g, hoverChipType, hoveredColumn, -1, lineThickness);
                     }
                 }
                 else
                 {
-                    drawChip(g, hoverChipType, hoveredColumn, -1, lineThickness);
+                    drawChipAtGridLocation(g, hoverChipType, hoveredColumn, -1, lineThickness);
                 }
             }
 
-            // Draw the total win scores for the player 1 (red) and player 2 (yellow):
+            // Print a message under the game board saying to "Click anywhere to start a new round..." if the game is over.
+            // If the game is not over, print the scores of the red player and the yellow player.
             using (StringFormat sf = new StringFormat())
             {
+                int fontSize = 18;
+
+                Rectangle textBounds = new Rectangle(0,
+                    gameBoardYPadding + (gridBoxHeight * TOTAL_ROWS),
+                    this.Width,
+                    (int)(gridBoxHeight * 1.5) - (fontSize / 2));
+
                 sf.LineAlignment = StringAlignment.Center;
                 sf.Alignment = StringAlignment.Center;
-                g.DrawString(redPlayerWinTotal + " : " + yellowPlayerWinTotal, scoreFont, Brushes.White, new Rectangle(0, 0, this.Width, (this.Height * 2) - 48), sf);
+
+                using (Font scoreFont = new Font("Arial", fontSize, FontStyle.Bold))
+                {
+                    string txt = isGameOver ? "Click anywhere to start a new round..." : redPlayerWinTotal + " : " + yellowPlayerWinTotal;
+
+                    g.DrawString(txt, scoreFont, Brushes.White, textBounds, sf);
+                }
             }
         }
     } // End class
