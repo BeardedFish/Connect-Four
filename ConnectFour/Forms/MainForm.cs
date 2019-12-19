@@ -9,7 +9,7 @@ namespace ConnectFour
         /// <summary>
         /// The prefix title of the form.
         /// </summary>
-        private string prefixFormTitle;
+        private readonly string prefixFormTitle;
 
         /// <summary>
         /// The constructor for the 'MainForm'.
@@ -28,10 +28,10 @@ namespace ConnectFour
         /// </summary>
         private void SubscribeToEvents()
         {
-            connectFourGameContainer.OnColumnFull += connectFourGameContainer_OnColumnFull;
-            connectFourGameContainer.OnGameOver += connectFourGameContainer_OnGameOver;
-            connectFourGameContainer.OnNewGame += connectFourGameContainer_OnNewGame;
-            connectFourGameContainer.OnPlayerTurnChange += connectFourGameContainer_OnPlayerTurnChange;
+            connectFourGameContainer.OnColumnFull += ConnectFourGameContainer_OnColumnFull;
+            connectFourGameContainer.OnGameOver += ConnectFourGameContainer_OnGameOver;
+            connectFourGameContainer.OnNewGame += ConnectFourGameContainer_OnNewGame;
+            connectFourGameContainer.OnPlayerTurnChange += ConnectFourGameContainer_OnPlayerTurnChange;
         }
 
         /// <summary>
@@ -66,7 +66,7 @@ namespace ConnectFour
         /// </summary>
         /// <param name="sender">The object that raised the event.</param>
         /// <param name="redPlayerTurn">A boolean that states if it is the red players turn or the yellow players turn.</param>
-        private void connectFourGameContainer_OnNewGame(object sender, bool redPlayerTurn)
+        private void ConnectFourGameContainer_OnNewGame(object sender, bool redPlayerTurn)
         {
             UpdateTitle(GetTurnText(redPlayerTurn));
         }
@@ -76,7 +76,7 @@ namespace ConnectFour
         /// </summary>
         /// <param name="sender">The object that raised the event.</param>
         /// <param name="gameResult">The final result of the game when it ended (red player won, yellow player won, or tie).</param>
-        private void connectFourGameContainer_OnGameOver(object sender, Result gameResult)
+        private void ConnectFourGameContainer_OnGameOver(object sender, Result gameResult)
         {
             string resultText = "";
             switch (gameResult)
@@ -92,7 +92,6 @@ namespace ConnectFour
                     break;
             }
 
-            // Invoke the current form because this method is because raised from a different thread
             UpdateTitle("Game Over! " + resultText);
         }
 
@@ -101,7 +100,7 @@ namespace ConnectFour
         /// </summary>
         /// <param name="sender">The object that raised the event.</param>
         /// <param name="redPlayerTurn">A boolean that states if it is the red players turn or the yellow players turn.</param>
-        private void connectFourGameContainer_OnPlayerTurnChange(object sender, bool redPlayerTurn)
+        private void ConnectFourGameContainer_OnPlayerTurnChange(object sender, bool redPlayerTurn)
         {
             UpdateTitle(GetTurnText(redPlayerTurn));
         }
@@ -110,9 +109,9 @@ namespace ConnectFour
         /// Event handler for when a human player clicks on a column that is full.
         /// </summary>
         /// <param name="sender">The object that raised the event.</param>
-        private void connectFourGameContainer_OnColumnFull(object sender)
+        private void ConnectFourGameContainer_OnColumnFull(object sender)
         {
-            MessageBox.Show("Uh-oh. The column you clicked on seems to be full. Please try a different column", "Yikes!", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+            MessageBox.Show("The column you clicked on is full. Please try a different column.", "Yikes!", MessageBoxButtons.OK, MessageBoxIcon.Warning);
         }
 
         /// <summary>
@@ -120,7 +119,7 @@ namespace ConnectFour
         /// </summary>
         /// <param name="sender">The object that raised the event.</param>
         /// <param name="e">The event arguments for when the event was raised.</param>
-        private void mnuNewGame_Click(object sender, EventArgs e)
+        private void MnuNewGame_Click(object sender, EventArgs e)
         {
             DialogResult msgConfirmResult = MessageBox.Show("Are you sure you want to start a new game? This will reset the total wins for both players to 0.", "Confirm", MessageBoxButtons.YesNo, MessageBoxIcon.Question);
 
@@ -145,7 +144,7 @@ namespace ConnectFour
         /// </summary>
         /// <param name="sender">The object that raised the event.</param>
         /// <param name="e">The event arguments for when the event was raised.</param>
-        private void mnuExit_Click(object sender, EventArgs e)
+        private void MnuExit_Click(object sender, EventArgs e)
         {
             Application.Exit();
         }
@@ -155,7 +154,7 @@ namespace ConnectFour
         /// </summary>
         /// <param name="sender">The object that raised the event.</param>
         /// <param name="e">The event arguments for when the event was raised.</param>
-        private void mnuMuteSoundEffects_Click(object sender, EventArgs e)
+        private void MnuMuteSoundEffects_Click(object sender, EventArgs e)
         {
             mnuMuteSoundEffects.Checked = !mnuMuteSoundEffects.Checked;
 
@@ -167,7 +166,7 @@ namespace ConnectFour
         /// </summary>
         /// <param name="sender">The object that raised the event.</param>
         /// <param name="e">The event arguments for when the event was raised.</param>
-        private void mnuAbout_Click(object sender, EventArgs e)
+        private void MnuAbout_Click(object sender, EventArgs e)
         {
             MessageBox.Show("Program Name: Connect Four" +
                 "\nProgram By: Darian Benam" +

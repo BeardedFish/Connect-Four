@@ -62,7 +62,7 @@
             // 
             this.mnuNewGame.Index = 0;
             this.mnuNewGame.Text = "New Game";
-            this.mnuNewGame.Click += new System.EventHandler(this.mnuNewGame_Click);
+            this.mnuNewGame.Click += new System.EventHandler(this.MnuNewGame_Click);
             // 
             // menuItem5
             // 
@@ -73,7 +73,7 @@
             // 
             this.mnuExit.Index = 2;
             this.mnuExit.Text = "Exit";
-            this.mnuExit.Click += new System.EventHandler(this.mnuExit_Click);
+            this.mnuExit.Click += new System.EventHandler(this.MnuExit_Click);
             // 
             // menuItem3
             // 
@@ -86,7 +86,7 @@
             // 
             this.mnuMuteSoundEffects.Index = 0;
             this.mnuMuteSoundEffects.Text = "Mute Sound Effects";
-            this.mnuMuteSoundEffects.Click += new System.EventHandler(this.mnuMuteSoundEffects_Click);
+            this.mnuMuteSoundEffects.Click += new System.EventHandler(this.MnuMuteSoundEffects_Click);
             // 
             // menuItem2
             // 
@@ -99,7 +99,7 @@
             // 
             this.mnuAbout.Index = 0;
             this.mnuAbout.Text = "About";
-            this.mnuAbout.Click += new System.EventHandler(this.mnuAbout_Click);
+            this.mnuAbout.Click += new System.EventHandler(this.MnuAbout_Click);
             // 
             // connectFourGameContainer
             // 
