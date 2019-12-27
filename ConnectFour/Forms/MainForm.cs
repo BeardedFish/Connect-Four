@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Windows.Forms;
-using static ConnectFour.ConnectFourGameContainer;
+using ConnectFour.Enums;
 
 namespace ConnectFour
 {

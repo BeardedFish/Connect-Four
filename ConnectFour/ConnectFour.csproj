@@ -69,6 +69,8 @@
     <Compile Include="Controls\ConnectFourGameContainer.cs">
       <SubType>Component</SubType>
     </Compile>
+    <Compile Include="Enums\Chip.cs" />
+    <Compile Include="Enums\Result.cs" />
     <Compile Include="Forms\MainForm.cs">
       <SubType>Form</SubType>
     </Compile>

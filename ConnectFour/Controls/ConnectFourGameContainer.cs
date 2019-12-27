@@ -24,6 +24,7 @@ using System.Windows.Forms;
 using System.Threading;
 using System.Media;
 using System.IO;
+using ConnectFour.Enums;
 using ConnectFour.Properties;
 
 namespace ConnectFour
@@ -67,27 +68,6 @@ namespace ConnectFour
         /// <param name="redPlayerTurn"></param>
         public delegate void NewGameHandler(object sender, bool redPlayerTurn);
         public event NewGameHandler OnNewGame;
-
-        /// <summary>
-        /// An enum that holds all the possible results after a player places a chip in the game board.
-        /// </summary>
-        public enum Result
-        {
-            OngoingGame,
-            TiedGame,
-            RedPlayerWins,
-            YellowPlayerWins
-        }
-
-        /// <summary>
-        /// An enum that holds all the possible results the game board can contain.
-        /// </summary>
-        private enum Chip
-        {
-            Empty,
-            Red,
-            Yellow
-        }
 
         /// <summary>
         /// A constant integer that states the total number of columns the Connect Four game board has.
@@ -207,7 +187,7 @@ namespace ConnectFour
                 MakeComputerDoMove();
             }
 
-            OnNewGame?.Invoke(this, isRedPlayerTurn);
+            OnNewGame?.Invoke(this, isRedPlayerTurn); // Raise the event
 
             // Repaint the game container
             this.Invalidate();
@@ -287,7 +267,7 @@ namespace ConnectFour
 
             // Check the game outcome to see if there is a winner
             Result gameResult = GetGameResult();
-            switch (gameResult)
+            switch (GetGameResult())
             {
                 case Result.OngoingGame:
                     SwitchTurn();
@@ -312,7 +292,7 @@ namespace ConnectFour
             {
                 isGameOver = true;
 
-                OnGameOver?.Invoke(this, gameResult);
+                OnGameOver?.Invoke(this, gameResult); // Raise the event
             }
         }
 
@@ -323,7 +303,7 @@ namespace ConnectFour
         {
             isRedPlayerTurn = !isRedPlayerTurn;
 
-            OnPlayerTurnChange?.Invoke(this, isRedPlayerTurn);
+            OnPlayerTurnChange?.Invoke(this, isRedPlayerTurn); // Raise the event
         }
         
         /// <summary>
@@ -357,7 +337,7 @@ namespace ConnectFour
                 gameBoardArray[row, col] = Chip.Yellow;
             }
 
-            OnChipPlaced?.Invoke(this);
+            OnChipPlaced?.Invoke(this); // Raise the event
 
             // Repaint the game container
             this.Invalidate();
@@ -367,7 +347,8 @@ namespace ConnectFour
         /// Searches a specific column for an empty row number where a chip exists under it.
         /// </summary>
         /// <param name="col">The column to be searched.</param>
-        /// <returns>Either -1 which means the column is full or a number that represents a row number index 
+        /// <returns>
+        /// Either -1 which means the column is full or a number that represents a row number index 
         /// for the 'gameBoardArray' array.
         /// </returns>
         private int GetRowToPlaceChip(int col)
@@ -417,10 +398,10 @@ namespace ConnectFour
         /// Updates the 'winCoordinates' array of type Point with the locations of the 4 grid boxes on the
         /// game board.
         /// </summary>
-        /// <param name="point1">Column #1 of winning grid block.</param>
-        /// <param name="point2">Column #1 of winning grid block.</param>
-        /// <param name="point3">Column #1 of winning grid block.</param>
-        /// <param name="point4">Column #1 of winning grid block.</param>
+        /// <param name="point1">Coordinate #1 of winning grid block.</param>
+        /// <param name="point2">Coordinate #2 of winning grid block.</param>
+        /// <param name="point3">Coordinate #3 of winning grid block.</param>
+        /// <param name="point4">Coordinate #4 of winning grid block.</param>
         private void UpdateWinCoordinates(Point point1, Point point2, Point point3, Point point4)
         {
             winCoordinates = new Point[] { point1, point2, point3, point4 };
@@ -430,13 +411,37 @@ namespace ConnectFour
         }
 
         /// <summary>
-        /// 
+        /// Checks the game board to see if the game is still ongoing, the red player won, the yellow
+        /// player won, or if the game ended in a tie.
         /// </summary>
-        /// <returns>
-        /// A Result enum that states whether the game is ongoing, red player won, yellow player won, or if
-        /// the game ended in a tie.
-        /// </returns>
+        /// <returns>A Result enum that states the outcome of the game.</returns>
         private Result GetGameResult()
+        {
+            if (HasPlayerWon(Chip.Red))
+            {
+                return Result.RedPlayerWins;
+            }
+
+            if (HasPlayerWon(Chip.Yellow))
+            {
+                return Result.YellowPlayerWins;
+            }
+
+            if (IsGridFilled())
+            {
+                return Result.TiedGame;
+            }
+
+            return Result.OngoingGame;
+        }
+
+        /// <summary>
+        /// Checks the game board to see if a player has 4 chips in a row in either a horizontal, 
+        /// vertical, or diagonal direction.
+        /// </summary>
+        /// <param name="playerChip">The chip of the player that should be checked.</param>
+        /// <returns>A boolean stating whether the player has won or not.</returns>
+        private bool HasPlayerWon(Chip playerChip)
         {
             /*
              * Check horizontally for win.
@@ -454,22 +459,13 @@ namespace ConnectFour
             {
                 for (int col = 0; col < gameBoardArray.GetLength(1) - 3; col++)
                 {
-                    if (gameBoardArray[row, col] == Chip.Red
-                        && gameBoardArray[row, col + 1] == Chip.Red
-                        && gameBoardArray[row, col + 2] == Chip.Red
-                        && gameBoardArray[row, col + 3] == Chip.Red)
+                    if (gameBoardArray[row, col] == playerChip
+                        && gameBoardArray[row, col + 1] == playerChip
+                        && gameBoardArray[row, col + 2] == playerChip
+                        && gameBoardArray[row, col + 3] == playerChip)
                     {
                         UpdateWinCoordinates(new Point(col, row), new Point(col + 1, row), new Point(col + 2, row), new Point(col + 3, row));
-                        return Result.RedPlayerWins;
-                    }
-
-                    if (gameBoardArray[row, col] == Chip.Yellow
-                         && gameBoardArray[row, col + 1] == Chip.Yellow
-                         && gameBoardArray[row, col + 2] == Chip.Yellow
-                         && gameBoardArray[row, col + 3] == Chip.Yellow)
-                    {
-                        UpdateWinCoordinates(new Point(col, row), new Point(col + 1, row), new Point(col + 2, row), new Point(col + 3, row));
-                        return Result.YellowPlayerWins;
+                        return true;
                     }
                 } // End inner for (columns)
             } // End outer for (rows)
@@ -490,22 +486,13 @@ namespace ConnectFour
             {
                 for (int col = 0; col < gameBoardArray.GetLength(1); col++)
                 {
-                    if (gameBoardArray[row, col] == Chip.Red
-                        && gameBoardArray[row + 1, col] == Chip.Red
-                        && gameBoardArray[row + 2, col] == Chip.Red
-                        && gameBoardArray[row + 3, col] == Chip.Red)
+                    if (gameBoardArray[row, col] == playerChip
+                        && gameBoardArray[row + 1, col] == playerChip
+                        && gameBoardArray[row + 2, col] == playerChip
+                        && gameBoardArray[row + 3, col] == playerChip)
                     {
                         UpdateWinCoordinates(new Point(col, row), new Point(col, row + 1), new Point(col, row + 2), new Point(col, row + 3));
-                        return Result.RedPlayerWins;
-                    }
-
-                    if (gameBoardArray[row, col] == Chip.Yellow
-                        && gameBoardArray[row + 1, col] == Chip.Yellow
-                        && gameBoardArray[row + 2, col] == Chip.Yellow
-                        && gameBoardArray[row + 3, col] == Chip.Yellow)
-                    {
-                        UpdateWinCoordinates(new Point(col, row), new Point(col, row + 1), new Point(col, row + 2), new Point(col, row + 3));
-                        return Result.YellowPlayerWins;
+                        return true;
                     }
                 } // End inner for (columns)
             } // End outer for (rows)
@@ -526,22 +513,13 @@ namespace ConnectFour
             {
                 for (int col = 0; col < gameBoardArray.GetLength(1) - 3; col++)
                 {
-                    if (gameBoardArray[row, col] == Chip.Red
-                        && gameBoardArray[row + 1, col + 1] == Chip.Red
-                        && gameBoardArray[row + 2, col + 2] == Chip.Red
-                        && gameBoardArray[row + 3, col + 3] == Chip.Red)
+                    if (gameBoardArray[row, col] == playerChip
+                        && gameBoardArray[row + 1, col + 1] == playerChip
+                        && gameBoardArray[row + 2, col + 2] == playerChip
+                        && gameBoardArray[row + 3, col + 3] == playerChip)
                     {
                         UpdateWinCoordinates(new Point(col, row), new Point(col + 1, row + 1), new Point(col + 2, row + 2), new Point(col + 3, row + 3));
-                        return Result.RedPlayerWins;
-                    }
-
-                    if (gameBoardArray[row, col] == Chip.Yellow
-                        && gameBoardArray[row + 1, col + 1] == Chip.Yellow
-                        && gameBoardArray[row + 2, col + 2] == Chip.Yellow
-                        && gameBoardArray[row + 3, col + 3] == Chip.Yellow)
-                    {
-                        UpdateWinCoordinates(new Point(col, row), new Point(col + 1, row + 1), new Point(col + 2, row + 2), new Point(col + 3, row + 3));
-                        return Result.YellowPlayerWins;
+                        return true;
                     }
                 } // End inner for (columns)
             } // End outer for (rows)
@@ -562,32 +540,18 @@ namespace ConnectFour
             {
                 for (int col = gameBoardArray.GetLength(1) - 1; col >= 3; col--)
                 {
-                    if (gameBoardArray[row, col] == Chip.Red
-                        && gameBoardArray[row + 1, col - 1] == Chip.Red
-                        && gameBoardArray[row + 2, col - 2] == Chip.Red
-                        && gameBoardArray[row + 3, col - 3] == Chip.Red)
+                    if (gameBoardArray[row, col] == playerChip
+                        && gameBoardArray[row + 1, col - 1] == playerChip
+                        && gameBoardArray[row + 2, col - 2] == playerChip
+                        && gameBoardArray[row + 3, col - 3] == playerChip)
                     {
                         UpdateWinCoordinates(new Point(col, row), new Point(col - 1, row + 1), new Point(col - 2, row + 2), new Point(col - 3, row + 3));
-                        return Result.RedPlayerWins;
-                    }
-
-                    if (gameBoardArray[row, col] == Chip.Yellow
-                        && gameBoardArray[row + 1, col - 1] == Chip.Yellow
-                        && gameBoardArray[row + 2, col - 2] == Chip.Yellow
-                        && gameBoardArray[row + 3, col - 3] == Chip.Yellow)
-                    {
-                        UpdateWinCoordinates(new Point(col, row), new Point(col - 1, row + 1), new Point(col - 2, row + 2), new Point(col - 3, row + 3));
-                        return Result.YellowPlayerWins;
+                        return true;
                     }
                 } // End inner for (columns)
             } // End outer for (rows)
 
-            if (IsGridFilled())
-            {
-                return Result.TiedGame;
-            }
-
-            return Result.OngoingGame;
+            return false;
         }
 
         /// <summary>
@@ -758,7 +722,7 @@ namespace ConnectFour
                 }
                 else // The column is full
                 {
-                    OnColumnFull?.Invoke(this);
+                    OnColumnFull?.Invoke(this); // Raise the event
                 }
             }
         }
