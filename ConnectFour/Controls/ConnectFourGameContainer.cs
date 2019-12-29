@@ -267,7 +267,7 @@ namespace ConnectFour
 
             // Check the game outcome to see if there is a winner
             Result gameResult = GetGameResult();
-            switch (GetGameResult())
+            switch (gameResult)
             {
                 case Result.OngoingGame:
                     SwitchTurn();
