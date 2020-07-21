@@ -1,4 +1,4 @@
-﻿namespace ConnectFour
+﻿namespace ConnectFour.Forms
 {
     partial class MainForm
     {
@@ -105,20 +105,18 @@
             // 
             this.connectFourGameContainer.Dock = System.Windows.Forms.DockStyle.Fill;
             this.connectFourGameContainer.Location = new System.Drawing.Point(0, 0);
-            this.connectFourGameContainer.Margin = new System.Windows.Forms.Padding(4);
             this.connectFourGameContainer.Name = "connectFourGameContainer";
-            this.connectFourGameContainer.Size = new System.Drawing.Size(1271, 905);
+            this.connectFourGameContainer.Size = new System.Drawing.Size(924, 603);
             this.connectFourGameContainer.TabIndex = 0;
             this.connectFourGameContainer.Text = "connectFourGameContainer1";
             // 
             // MainForm
             // 
-            this.AutoScaleDimensions = new System.Drawing.SizeF(11F, 24F);
+            this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(1271, 905);
+            this.ClientSize = new System.Drawing.Size(924, 603);
             this.Controls.Add(this.connectFourGameContainer);
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
-            this.Margin = new System.Windows.Forms.Padding(4);
             this.Menu = this.mainMenu1;
             this.Name = "MainForm";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;

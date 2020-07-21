@@ -2,7 +2,7 @@
 using System.Windows.Forms;
 using ConnectFour.Enums;
 
-namespace ConnectFour
+namespace ConnectFour.Forms
 {
     public partial class MainForm : Form
     {
