@@ -8,7 +8,7 @@
     <OutputType>WinExe</OutputType>
     <RootNamespace>ConnectFour</RootNamespace>
     <AssemblyName>ConnectFour</AssemblyName>
-    <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.7.2</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <Deterministic>true</Deterministic>
     <PublishUrl>publish\</PublishUrl>
@@ -26,6 +26,7 @@
     <IsWebBootstrapper>false</IsWebBootstrapper>
     <UseApplicationTrust>false</UseApplicationTrust>
     <BootstrapperEnabled>true</BootstrapperEnabled>
+    <TargetFrameworkProfile />
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <PlatformTarget>AnyCPU</PlatformTarget>
@@ -37,6 +38,7 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <TreatWarningsAsErrors>false</TreatWarningsAsErrors>
+    <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <PlatformTarget>AnyCPU</PlatformTarget>
@@ -46,12 +48,16 @@
     <DefineConstants>TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+    <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <PropertyGroup>
-    <ApplicationIcon>ConnectFourIcon.ico</ApplicationIcon>
+    <ApplicationIcon>Resources\ConnectFourIcon.ico</ApplicationIcon>
   </PropertyGroup>
   <PropertyGroup>
     <SignManifests>true</SignManifests>
+  </PropertyGroup>
+  <PropertyGroup>
+    <ApplicationManifest>app.manifest</ApplicationManifest>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
@@ -66,17 +72,23 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Controls\ConnectFourGameContainer.cs">
-      <SubType>Component</SubType>
-    </Compile>
-    <Compile Include="Enums\Chip.cs" />
-    <Compile Include="Enums\Result.cs" />
     <Compile Include="Forms\MainForm.cs">
       <SubType>Form</SubType>
     </Compile>
     <Compile Include="Forms\MainForm.Designer.cs">
       <DependentUpon>MainForm.cs</DependentUpon>
     </Compile>
+    <Compile Include="Game\AI\Minimax.cs" />
+    <Compile Include="Game\Controls\ConnectFour.HideProperties.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="Game\Enums\Chip.cs" />
+    <Compile Include="Game\ConnectFourBoard.cs" />
+    <Compile Include="Game\Controls\ConnectFour.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="Game\Enums\ChipPlaceOutcome.cs" />
+    <Compile Include="Game\IsWinnerResult.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <EmbeddedResource Include="Forms\MainForm.resx">
@@ -104,13 +116,13 @@
     </Compile>
   </ItemGroup>
   <ItemGroup>
+    <None Include="app.manifest" />
     <None Include="Resources\Pop_Sound_Effect.wav" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\Game_Over_Sound_Effect.wav" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="ConnectFourIcon.ico" />
     <None Include="Resources\ConnectFourIcon.ico" />
   </ItemGroup>
   <ItemGroup>
@@ -120,5 +132,6 @@
       <Install>false</Install>
     </BootstrapperPackage>
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

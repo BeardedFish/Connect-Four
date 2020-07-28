@@ -1,11 +1,21 @@
-﻿using System;
+﻿// File Name:     MainForm.cs
+// By:            Darian Benam (GitHub: https://github.com/BeardedFish/)
+// Date:          Monday, July 27, 2020
+
+using ConnectFour.Game.Enums;
+using System;
+using System.Drawing;
 using System.Windows.Forms;
-using ConnectFour.Enums;
 
 namespace ConnectFour.Forms
 {
     public partial class MainForm : Form
     {
+        /// <summary>
+        /// The width and height of the <see cref="MainForm"/>.
+        /// </summary>
+        private const int FormHeight = 955, FormWidth = 1430;
+
         /// <summary>
         /// The prefix title of the form.
         /// </summary>
@@ -17,21 +27,24 @@ namespace ConnectFour.Forms
         public MainForm()
         {
             InitializeComponent();
-
-            prefixFormTitle = this.Text;
-
             SubscribeToEvents();
-        }
 
+            Size = new Size(FormWidth, FormHeight);
+            prefixFormTitle = Text;
+        }
+        
         /// <summary>
-        /// Subscribes to events that the 'connectFourGameContainer' control has.
+        /// 
         /// </summary>
-        private void SubscribeToEvents()
+        /// <returns>True if the user wants to exit out of the form, if not, false.</returns>
+        private bool ConfirmExitWithUser()
         {
-            connectFourGameContainer.OnColumnFull += ConnectFourGameContainer_OnColumnFull;
-            connectFourGameContainer.OnGameOver += ConnectFourGameContainer_OnGameOver;
-            connectFourGameContainer.OnNewGame += ConnectFourGameContainer_OnNewGame;
-            connectFourGameContainer.OnPlayerTurnChange += ConnectFourGameContainer_OnPlayerTurnChange;
+            DialogResult dialogResult = MessageBox.Show("Are you sure you want to exit out of the Connect Four game?",
+                "Confirm",
+                MessageBoxButtons.YesNo,
+                MessageBoxIcon.Warning);
+
+            return dialogResult == DialogResult.Yes;
         }
 
         /// <summary>
@@ -40,138 +53,137 @@ namespace ConnectFour.Forms
         /// <param name="updatedSuffixText">The updated suffix text to add to the form title.</param>
         private void UpdateTitle(string updatedSuffixText)
         {
-            try
+            string newTitle = prefixFormTitle + " | " + updatedSuffixText;
+
+            if (InvokeRequired)
             {
-                // We have to invoke this because it's going to be called from a different thread
-                this.Invoke((MethodInvoker)delegate
+                Invoke((MethodInvoker)delegate()
                 {
-                    this.Text = prefixFormTitle + " | " + updatedSuffixText;
+                    Text = newTitle;
                 });
             }
-            catch (ObjectDisposedException) {}
-        }
-
-        /// <summary>
-        /// Converts a boolean stating whose turn it is into a string that states whose turn it is.
-        /// </summary>
-        /// <param name="isRedPlayerTurn">A boolean that states whose turn it is.</param>
-        /// <returns>A string that states whose turn it is.</returns>
-        private string GetTurnText(bool isRedPlayerTurn)
-        {
-            return isRedPlayerTurn ? "Red Players Turn" : "Yellow Players Turn";
-        }
-
-        /// <summary>
-        /// Event handler for when a new Connect Four game starts.
-        /// </summary>
-        /// <param name="sender">The object that raised the event.</param>
-        /// <param name="redPlayerTurn">A boolean that states if it is the red players turn or the yellow players turn.</param>
-        private void ConnectFourGameContainer_OnNewGame(object sender, bool redPlayerTurn)
-        {
-            UpdateTitle(GetTurnText(redPlayerTurn));
-        }
-
-        /// <summary>
-        /// Event handler for when the Connect Four game is over from either when someone wins or it ends in a tie.
-        /// </summary>
-        /// <param name="sender">The object that raised the event.</param>
-        /// <param name="gameResult">The final result of the game when it ended (red player won, yellow player won, or tie).</param>
-        private void ConnectFourGameContainer_OnGameOver(object sender, Result gameResult)
-        {
-            string resultText = "";
-            switch (gameResult)
+            else
             {
-                case Result.RedPlayerWins:
-                    resultText = "Red player has won.";
-                    break;
-                case Result.TiedGame:
-                    resultText = "Game ended in a tie.";
-                    break;
-                case Result.YellowPlayerWins:
-                    resultText = "Yellow player has won.";
-                    break;
-            }
-
-            UpdateTitle("Game Over! " + resultText);
-        }
-
-        /// <summary>
-        /// Event handler for when the turn changes.
-        /// </summary>
-        /// <param name="sender">The object that raised the event.</param>
-        /// <param name="redPlayerTurn">A boolean that states if it is the red players turn or the yellow players turn.</param>
-        private void ConnectFourGameContainer_OnPlayerTurnChange(object sender, bool redPlayerTurn)
-        {
-            UpdateTitle(GetTurnText(redPlayerTurn));
-        }
-
-        /// <summary>
-        /// Event handler for when a human player clicks on a column that is full.
-        /// </summary>
-        /// <param name="sender">The object that raised the event.</param>
-        private void ConnectFourGameContainer_OnColumnFull(object sender)
-        {
-            MessageBox.Show("The column you clicked on is full. Please try a different column.", "Yikes!", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-        }
-
-        /// <summary>
-        /// Method that handles when the 'New Game' menu item is clicked.
-        /// </summary>
-        /// <param name="sender">The object that raised the event.</param>
-        /// <param name="e">The event arguments for when the event was raised.</param>
-        private void MnuNewGame_Click(object sender, EventArgs e)
-        {
-            DialogResult msgConfirmResult = MessageBox.Show("Are you sure you want to start a new game? This will reset the total wins for both players to 0.", "Confirm", MessageBoxButtons.YesNo, MessageBoxIcon.Question);
-
-            if (msgConfirmResult == DialogResult.Yes)
-            {
-                DialogResult msgOpponentResult = MessageBox.Show("Would you like to play against a computer player?", "Question", MessageBoxButtons.YesNoCancel, MessageBoxIcon.Question);
-
-                if (msgOpponentResult == DialogResult.Cancel)
-                {
-                    return;
-                }
-
-                bool playAgainstComputer = msgOpponentResult == DialogResult.Yes;
-
-                connectFourGameContainer.ToggleComputerOpponent(playAgainstComputer);
-                connectFourGameContainer.StartNewGame(true);
+                Text = newTitle;
             }
         }
 
         /// <summary>
-        /// Method that handles when the 'Exit' menu item is clicked.
+        /// Subscribes to events that the 'connectFourGameContainer' control has.
         /// </summary>
-        /// <param name="sender">The object that raised the event.</param>
-        /// <param name="e">The event arguments for when the event was raised.</param>
-        private void MnuExit_Click(object sender, EventArgs e)
+        private void SubscribeToEvents()
         {
-            Application.Exit();
+            connectFourControl.OnClickedFullColumn += ConnectFourControl_OnClickedFullColumn;
+            connectFourControl.GameBoard.OnGameOver += GameBoard_OnGameOver;
+            connectFourControl.GameBoard.OnSwitchTurn += GameBoard_OnSwitchTurn;
+            connectFourControl.GameBoard.OnNewGame += GameBoard_OnNewGame;
         }
 
         /// <summary>
-        /// Method that handles when the 'Mute Sound Effects' menu item is clicked.
+        /// Updates the <see cref="MainForm"/> title bar to text that states the current players turn.
         /// </summary>
-        /// <param name="sender">The object that raised the event.</param>
-        /// <param name="e">The event arguments for when the event was raised.</param>
-        private void MnuMuteSoundEffects_Click(object sender, EventArgs e)
+        private void UpdateTitleWithCurrentTurn()
         {
-            mnuMuteSoundEffects.Checked = !mnuMuteSoundEffects.Checked;
-
-            connectFourGameContainer.ToggleSound(mnuMuteSoundEffects.Checked);
+            UpdateTitle(connectFourControl?.GameBoard.CurrentChipTurn == Chip.Red ? "Red Players Turn" : "Yellow Players Turn");
         }
 
         /// <summary>
-        /// Method that handles when the 'About' menu item is clicked.
+        /// 
         /// </summary>
         /// <param name="sender">The object that raised the event.</param>
-        /// <param name="e">The event arguments for when the event was raised.</param>
-        private void MnuAbout_Click(object sender, EventArgs e)
+        /// <param name="e">The data about the event.</param>
+        private void MainForm_FormClosing(object sender, FormClosingEventArgs e)
         {
-            MessageBox.Show("Program Name: Connect Four" +
-                "\nProgram By: Darian Benam" +
-                "\nSound Effects By: Mark DiAngelo & Mike Koenig" +
-                "\nVersion 1.0", "About", MessageBoxButtons.OK, MessageBoxIcon.Information) ;
+            if (!ConfirmExitWithUser())
+            {
+                e.Cancel = true;
+            }
         }
+
+        #region Conenct Four Game Event Handlers
+        /// <summary>
+        /// Event handler for when a full column is clicked on the <see cref="connectFourControl"/>.
+        /// </summary>
+        /// <param name="sender">The object that raised the event.</param>
+        private void ConnectFourControl_OnClickedFullColumn(object sender)
+        {
+            MessageBox.Show("That column is full! Try another column.", "Yikes!", MessageBoxButtons.OK, MessageBoxIcon.Error);
+        }
+
+        /// <summary>
+        /// Event handler for when a new game of Connect Four is started.
+        /// </summary>
+        /// <param name="sender">The object that raised the event.</param>
+        private void GameBoard_OnNewGame(object sender)
+        {
+            UpdateTitleWithCurrentTurn();
+        }
+
+        /// <summary>
+        /// Event handler for when the Connect Four game is over.
+        /// </summary>
+        /// <param name="sender">The object that raised the event.</param>
+        /// <param name="gameOutcome"></param>
+        private void GameBoard_OnGameOver(object sender, GameOutcome gameOutcome)
+        {
+            
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="sender">The object that raised the event.</param>
+        private void GameBoard_OnSwitchTurn(object sender)
+        {
+            UpdateTitle(connectFourControl?.GameBoard.CurrentChipTurn == Chip.Red ? "Red Players Turn" : "Yellow Players Turn");
+        }
+        #endregion
+
+        #region Main Menu Item Handlers
+        /// <summary>
+        /// Event handler for when the <see cref="startNewGameMenu"/> is clicked.
+        /// </summary>
+        /// <param name="sender">The object that raised the event.</param>
+        /// <param name="e">The data about the event.</param>
+        private void StartNewGameMenu_Click(object sender, EventArgs e)
+        {
+            DialogResult dialogResult = MessageBox.Show("Are you sure you want to start a new game? The current progress of this game will be lost.", 
+                "Question", 
+                MessageBoxButtons.YesNo, 
+                MessageBoxIcon.Question);
+
+            if (dialogResult == DialogResult.Yes)
+            {
+                bool resetScores = MessageBox.Show("Would you like to reset both scores to zero?", "Question", MessageBoxButtons.YesNo, MessageBoxIcon.Question) == DialogResult.Yes;
+
+                connectFourControl.GameBoard.StartNewGame(resetScores);
+            }
+        }
+
+        /// <summary>
+        /// Event handler for when the <see cref="exitMenu"/> is clicked.
+        /// </summary>
+        /// <param name="sender">The object that raised the event.</param>
+        /// <param name="e">The data about the event.</param>
+        private void ExitMenu_Click(object sender, EventArgs e)
+        {
+            if (ConfirmExitWithUser())
+            {
+                Application.Exit();
+            }
+        }
+
+        /// <summary>
+        /// Event handler for when the <see cref="muteSoundEffectsMenu"/> is clicked.
+        /// </summary>
+        /// <param name="sender">The object that raised the event.</param>
+        /// <param name="e">The data about the event.</param>
+        private void MuteSoundEffectsMenu_Click(object sender, EventArgs e)
+        {
+            connectFourControl.IsSoundMuted = !connectFourControl.IsSoundMuted;
+
+            muteSoundEffectsMenu.Checked = connectFourControl.IsSoundMuted;
+        }
+        #endregion
     }
 }
