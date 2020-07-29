@@ -173,6 +173,11 @@ namespace ConnectFour.Forms
             }
         }
 
+        private void AboutMenu_Click(object sender, EventArgs e)
+        {
+            _ = new AboutForm().ShowDialog();
+        }
+
         /// <summary>
         /// Event handler for when the <see cref="muteSoundEffectsMenu"/> is clicked.
         /// </summary>

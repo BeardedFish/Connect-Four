@@ -103,6 +103,7 @@ namespace ConnectFour.Forms
             // 
             this.AboutMenu.Index = 0;
             this.AboutMenu.Text = "About";
+            this.AboutMenu.Click += new System.EventHandler(this.AboutMenu_Click);
             // 
             // connectFourControl
             // 
