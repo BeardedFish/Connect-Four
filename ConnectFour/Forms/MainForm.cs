@@ -184,6 +184,11 @@ namespace ConnectFour.Forms
             }
         }
 
+        /// <summary>
+        /// Event handler for when the <see cref="aboutMenu"/> is clicked.
+        /// </summary>
+        /// <param name="sender">The object that raised the event.</param>
+        /// <param name="e">The data about the event.</param>
         private void AboutMenu_Click(object sender, EventArgs e)
         {
             _ = new AboutForm().ShowDialog();
