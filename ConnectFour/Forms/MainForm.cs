@@ -22,6 +22,12 @@ namespace ConnectFour.Forms
         private readonly string prefixFormTitle;
 
         /// <summary>
+        /// States whether the form is exiting because the user confirmed that they want to exit out of the form via the <see cref="exitMenu"/> which is located under
+        /// the "File" menu.
+        /// </summary>
+        private bool exitingFromFileMenu = false;
+
+        /// <summary>
         /// The constructor for the 'MainForm'.
         /// </summary>
         public MainForm()
@@ -94,9 +100,12 @@ namespace ConnectFour.Forms
         /// <param name="e">The data about the event.</param>
         private void MainForm_FormClosing(object sender, FormClosingEventArgs e)
         {
-            if (!ConfirmExitWithUser())
+            if (!exitingFromFileMenu)
             {
-                e.Cancel = true;
+                if (!ConfirmExitWithUser())
+                {
+                    e.Cancel = true;
+                }
             }
         }
 
@@ -169,6 +178,8 @@ namespace ConnectFour.Forms
         {
             if (ConfirmExitWithUser())
             {
+                exitingFromFileMenu = true;
+
                 Application.Exit();
             }
         }
