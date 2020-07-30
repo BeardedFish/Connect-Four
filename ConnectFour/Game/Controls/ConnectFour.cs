@@ -19,7 +19,7 @@ namespace ConnectFour.Game.WindowsControls
         /// <summary>
         /// The thickness of the solid lines that will be drawn.
         /// </summary>
-        public const int LineThickness = 4;
+        public const int LineThickness = 8;
 
         /// <summary>
         /// The horizontal offset for the table that the Connect Four game board sits on.
