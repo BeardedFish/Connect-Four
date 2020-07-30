@@ -1,4 +1,4 @@
-﻿// File Name:     ConnectFourBoard.cs
+// File Name:     ConnectFourBoard.cs
 // By:            Darian Benam (GitHub: https://github.com/BeardedFish/)
 // Date:          July, June 23, 2020
 
@@ -63,13 +63,7 @@ namespace ConnectFour.Game
         /// <summary>
         /// States whether the game is over or not.
         /// </summary>
-        public bool IsGameOver
-        {
-            get
-            {
-                return CurrentGameStatus != GameOutcome.OngoingGame;
-            }
-        }
+        public bool IsGameOver => CurrentGameStatus != GameOutcome.OngoingGame;
 
         /// <summary>
         /// States whether the Connect Four board is filled in completely or not.
