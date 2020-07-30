@@ -1,4 +1,4 @@
-// File Name:     ConnectFourBoard.cs
+﻿// File Name:     ConnectFourBoard.cs
 // By:            Darian Benam (GitHub: https://github.com/BeardedFish/)
 // Date:          July, June 23, 2020
 
@@ -41,19 +41,6 @@ namespace ConnectFour.Game
             { Chip.Red, 0 },
             { Chip.Yellow, 0 }
         };
-
-        /// <summary>
-        /// States the grid locations where a player won. If no player won the game, then null is returned.
-        /// </summary>
-        public List<Point> WinLocations
-        {
-            get
-            {
-                IsWinnerResult result;
-
-                return (result = IsWinner(Chip.Red)).PlayerWon || (result = IsWinner(Chip.Yellow)).PlayerWon ? result.WinningLocations : null;
-            }
-        }
 
         /// <summary>
         /// States whether it is the computer players turn or not.
@@ -193,6 +180,20 @@ namespace ConnectFour.Game
             random = new Random();
 
             StartNewGame(false);
+        }
+
+        /// <summary>
+        /// Gets all the winning chip positions on the Connect Four board. A winning chip is a chip that is next to 3 other chips of the same type.
+        /// </summary>
+        /// <returns>
+        /// If the Connect Four board does have a winning player then a <see cref="List{T}"/> of type <see cref="Point"/> is returned. If no player won then null is
+        /// returned.
+        /// </returns>
+        public List<Point> GetWinLocations()
+        {
+            IsWinnerResult result;
+
+            return (result = IsWinner(Chip.Red)).PlayerWon || (result = IsWinner(Chip.Yellow)).PlayerWon ? result.WinningLocations : null;
         }
 
         /// <summary>

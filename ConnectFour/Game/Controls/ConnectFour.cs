@@ -5,6 +5,7 @@
 using ConnectFour.Game.Enums;
 using ConnectFour.Properties;
 using System;
+using System.Collections.Generic;
 using System.Drawing;
 using System.Drawing.Drawing2D;
 using System.IO;
@@ -281,9 +282,10 @@ namespace ConnectFour.Game.WindowsControls
                 g.FillRectangle(br, gameBoardBounds);
             }
 
-            if (GameBoard.WinLocations != null)
+            List<Point> winLocations = GameBoard.GetWinLocations();
+            if (winLocations != null)
             {
-                foreach (Point winLocation in GameBoard.WinLocations)
+                foreach (Point winLocation in winLocations)
                 {
                     Rectangle winGridBoxBounds = new Rectangle(BoardHorizontalPadding + winLocation.X * GridSquareWidth,
                         BoardVerticalPadding + winLocation.Y * GridSquareHeight,
