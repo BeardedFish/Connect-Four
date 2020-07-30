@@ -67,14 +67,7 @@ namespace ConnectFour.Game
         {
             get
             {
-                GameOutcome gameStatus = CurrentGameStatus;
-
-                if (gameStatus == GameOutcome.RedChipWon || gameStatus == GameOutcome.TiedGame || gameStatus == GameOutcome.YellowChipWon)
-                {
-                    return true;
-                }
-
-                return false;
+                return CurrentGameStatus != GameOutcome.OngoingGame;
             }
         }
 
