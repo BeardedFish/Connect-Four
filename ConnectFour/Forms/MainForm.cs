@@ -100,7 +100,7 @@ namespace ConnectFour.Forms
             }
         }
 
-        #region Conenct Four Game Event Handlers
+        #region Connect Four Game Event Handlers
         /// <summary>
         /// Event handler for when a full column is clicked on the <see cref="connectFourControl"/>.
         /// </summary>
