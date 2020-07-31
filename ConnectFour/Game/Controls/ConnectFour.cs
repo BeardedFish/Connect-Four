@@ -6,6 +6,7 @@ using ConnectFour.Game.Enums;
 using ConnectFour.Properties;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Drawing;
 using System.Drawing.Drawing2D;
 using System.IO;
@@ -35,31 +36,37 @@ namespace ConnectFour.Game.WindowsControls
         /// <summary>
         /// The width of a single grid square on the Connect Four board.
         /// </summary>
+        [Browsable(false)]
         public int GridSquareWidth { get; private set; }
 
         /// <summary>
         /// The height of a single grid square on the Connect Four board.
         /// </summary>
+        [Browsable(false)]
         public int GridSquareHeight { get; private set; }
 
         /// <summary>
         /// The horizontal padding of the Connect Four board.
         /// </summary>
+        [Browsable(false)]
         public int BoardHorizontalPadding { get; private set; }
 
         /// <summary>
         /// The vertical padding of the Connect Four board.
         /// </summary>
+        [Browsable(false)]
         public int BoardVerticalPadding { get; private set; }
 
         /// <summary>
         /// The Connect Four game board which contains data about the game.
         /// </summary>
+        [Browsable(false)]
         public ConnectFourBoard GameBoard { get; private set; }
 
         /// <summary>
         /// The column the mouse cursor is currently hovering over.
         /// </summary>
+        [Browsable(false)]
         public int CurrentHoveredColumn { get; private set; }
 
         /// <summary>
