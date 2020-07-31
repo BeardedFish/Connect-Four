@@ -50,7 +50,7 @@ namespace ConnectFour.Game
         /// <summary>
         /// States whether the game is over or not.
         /// </summary>
-        public bool IsGameOver => CurrentGameStatus != GameOutcome.OngoingGame;
+        public bool IsGameOver => CurrentGameStatus != GameStatus.OngoingGame;
 
         /// <summary>
         /// States whether the Connect Four board is filled in completely or not.
@@ -85,29 +85,29 @@ namespace ConnectFour.Game
         public Chip ComputerPlayerChip => FirstPlayerChip == Chip.Red ? Chip.Yellow : Chip.Red;
 
         /// <summary>
-        /// States the current game status of the Connect Four game. If the red chip won, then <see cref="GameOutcome.RedChipWon"/> is returned. If the yellow chip
-        /// won, then <see cref="GameOutcome.YellowChipWon"/> is returned. If the Connect Four board is filled in completely and neither the red or yellow chip won,
-        /// then <see cref="GameOutcome.TiedGame"/> is returned. If none of those are true, then <see cref="GameOutcome.OngoingGame"/> is returned.
+        /// States the current game status of the Connect Four game. If the red chip won, then <see cref="GameStatus.RedChipWon"/> is returned. If the yellow chip
+        /// won, then <see cref="GameStatus.YellowChipWon"/> is returned. If the Connect Four board is filled in completely and neither the red or yellow chip won,
+        /// then <see cref="GameStatus.TiedGame"/> is returned. If none of those are true, then <see cref="GameStatus.OngoingGame"/> is returned.
         /// </summary>
-        public GameOutcome CurrentGameStatus
+        public GameStatus CurrentGameStatus
         {
             get
             {
                 if (IsWinner(Chip.Red).PlayerWon)
                 {
-                    return GameOutcome.RedChipWon;
+                    return GameStatus.RedChipWon;
                 }
                 else if (IsWinner(Chip.Yellow).PlayerWon)
                 {
-                    return GameOutcome.YellowChipWon;
+                    return GameStatus.YellowChipWon;
                 }
                 else if (IsFilled)
                 {
-                    return GameOutcome.TiedGame;
+                    return GameStatus.TiedGame;
                 }
                 else
                 {
-                    return GameOutcome.OngoingGame;
+                    return GameStatus.OngoingGame;
                 }
             }
         }
@@ -123,7 +123,8 @@ namespace ConnectFour.Game
         /// Event handler for when the Connect Four game is over.
         /// </summary>
         /// <param name="sender">The object that raised the event.</param>
-        public delegate void OnGameOverHandler(object sender, GameOutcome gameOutcome);
+        /// <param name="endResult">The end result of the game.</param>
+        public delegate void OnGameOverHandler(object sender, GameStatus endResult);
         public event OnGameOverHandler OnGameOver;
 
         /// <summary>
@@ -265,14 +266,14 @@ namespace ConnectFour.Game
         /// </summary>
         private void UpdateScore()
         {
-            GameOutcome gameResult = CurrentGameStatus;
+            GameStatus gameResult = CurrentGameStatus;
 
-            if (gameResult == GameOutcome.RedChipWon)
+            if (gameResult == GameStatus.RedChipWon)
             {
                 Scores[Chip.Red]++;
             }
             
-            if (gameResult == GameOutcome.YellowChipWon)
+            if (gameResult == GameStatus.YellowChipWon)
             {
                 Scores[Chip.Yellow]++;
             }

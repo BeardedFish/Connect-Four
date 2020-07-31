@@ -92,7 +92,7 @@
     <Compile Include="Game\Controls\ConnectFour.cs">
       <SubType>Component</SubType>
     </Compile>
-    <Compile Include="Game\Enums\ChipPlaceOutcome.cs" />
+    <Compile Include="Game\Enums\GameStatus.cs" />
     <Compile Include="Game\IsWinnerResult.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

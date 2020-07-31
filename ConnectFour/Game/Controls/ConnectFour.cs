@@ -115,7 +115,7 @@ namespace ConnectFour.Game.WindowsControls
         /// </summary>
         /// <param name="sender">The object that raised the event.</param>
         /// <param name="gameOutcome">The outcome of the game.</param>
-        private void GameBoard_OnGameOver(object sender, GameOutcome gameOutcome)
+        private void GameBoard_OnGameOver(object sender, GameStatus gameOutcome)
         {
             PlaySoundEffect(Resources.Game_Over_Sound_Effect);
         }

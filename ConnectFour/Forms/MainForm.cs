@@ -132,14 +132,14 @@ namespace ConnectFour.Forms
         /// Event handler for when the Connect Four game is over.
         /// </summary>
         /// <param name="sender">The object that raised the event.</param>
-        /// <param name="gameOutcome"></param>
-        private void GameBoard_OnGameOver(object sender, GameOutcome gameOutcome)
+        /// <param name="endResult">The end result of the game.</param>
+        private void GameBoard_OnGameOver(object sender, GameStatus endResult)
         {
             string suffixText;
 
-            if (gameOutcome == GameOutcome.RedChipWon || gameOutcome == GameOutcome.YellowChipWon)
+            if (endResult == GameStatus.RedChipWon || endResult == GameStatus.YellowChipWon)
             {
-                suffixText = $"{(gameOutcome == GameOutcome.RedChipWon ? "Red" : "Yellow")} player has won.";
+                suffixText = $"{(endResult == GameStatus.RedChipWon ? "Red" : "Yellow")} player has won.";
             }
             else
             {
@@ -150,7 +150,7 @@ namespace ConnectFour.Forms
         }
 
         /// <summary>
-        /// 
+        /// Event handler for when the turns are switched via the <see cref="SwitchTurns"/> method.
         /// </summary>
         /// <param name="sender">The object that raised the event.</param>
         private void GameBoard_OnSwitchTurn(object sender)

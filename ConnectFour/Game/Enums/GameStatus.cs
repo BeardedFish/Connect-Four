@@ -4,7 +4,7 @@
 
 namespace ConnectFour.Game.Enums
 {
-    public enum GameOutcome
+    public enum GameStatus
     {
         OngoingGame,
         TiedGame,
