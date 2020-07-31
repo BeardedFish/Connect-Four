@@ -1,4 +1,8 @@
-﻿namespace ConnectFour.Forms
+﻿// File Name:     MainForm.Designer.cs
+// By:            Darian Benam (GitHub: https://github.com/BeardedFish/)
+// Date:          Monday, July 27, 2020
+
+namespace ConnectFour.Forms
 {
     partial class MainForm
     {
@@ -29,114 +33,115 @@
         private void InitializeComponent()
         {
             this.components = new System.ComponentModel.Container();
+            System.Windows.Forms.MenuItem fileMenu;
+            System.Windows.Forms.MenuItem settingsMenu;
+            System.Windows.Forms.MenuItem helpMenu;
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(MainForm));
-            this.mainMenu1 = new System.Windows.Forms.MainMenu(this.components);
-            this.menuItem1 = new System.Windows.Forms.MenuItem();
-            this.mnuNewGame = new System.Windows.Forms.MenuItem();
-            this.menuItem5 = new System.Windows.Forms.MenuItem();
-            this.mnuExit = new System.Windows.Forms.MenuItem();
-            this.menuItem3 = new System.Windows.Forms.MenuItem();
-            this.mnuMuteSoundEffects = new System.Windows.Forms.MenuItem();
-            this.menuItem2 = new System.Windows.Forms.MenuItem();
-            this.mnuAbout = new System.Windows.Forms.MenuItem();
-            this.connectFourGameContainer = new ConnectFour.ConnectFourGameContainer();
+            this.startNewGameMenu = new System.Windows.Forms.MenuItem();
+            this.seperatorMenu = new System.Windows.Forms.MenuItem();
+            this.exitMenu = new System.Windows.Forms.MenuItem();
+            this.muteSoundEffectsMenu = new System.Windows.Forms.MenuItem();
+            this.aboutMenu = new System.Windows.Forms.MenuItem();
+            this.mainMenu = new System.Windows.Forms.MainMenu(this.components);
+            this.connectFourControl = new ConnectFour.Game.WindowsControls.ConnectFour();
+            fileMenu = new System.Windows.Forms.MenuItem();
+            settingsMenu = new System.Windows.Forms.MenuItem();
+            helpMenu = new System.Windows.Forms.MenuItem();
             this.SuspendLayout();
             // 
-            // mainMenu1
+            // fileMenu
             // 
-            this.mainMenu1.MenuItems.AddRange(new System.Windows.Forms.MenuItem[] {
-            this.menuItem1,
-            this.menuItem3,
-            this.menuItem2});
+            fileMenu.Index = 0;
+            fileMenu.MenuItems.AddRange(new System.Windows.Forms.MenuItem[] {
+            this.startNewGameMenu,
+            this.seperatorMenu,
+            this.exitMenu});
+            fileMenu.Text = "File";
             // 
-            // menuItem1
+            // startNewGameMenu
             // 
-            this.menuItem1.Index = 0;
-            this.menuItem1.MenuItems.AddRange(new System.Windows.Forms.MenuItem[] {
-            this.mnuNewGame,
-            this.menuItem5,
-            this.mnuExit});
-            this.menuItem1.Text = "File";
+            this.startNewGameMenu.Index = 0;
+            this.startNewGameMenu.Text = "Start New Game";
+            this.startNewGameMenu.Click += new System.EventHandler(this.StartNewGameMenu_Click);
             // 
-            // mnuNewGame
+            // seperatorMenu
             // 
-            this.mnuNewGame.Index = 0;
-            this.mnuNewGame.Text = "New Game";
-            this.mnuNewGame.Click += new System.EventHandler(this.MnuNewGame_Click);
+            this.seperatorMenu.Index = 1;
+            this.seperatorMenu.Text = "-";
             // 
-            // menuItem5
+            // exitMenu
             // 
-            this.menuItem5.Index = 1;
-            this.menuItem5.Text = "-";
+            this.exitMenu.Index = 2;
+            this.exitMenu.Text = "Exit";
+            this.exitMenu.Click += new System.EventHandler(this.ExitMenu_Click);
             // 
-            // mnuExit
+            // settingsMenu
             // 
-            this.mnuExit.Index = 2;
-            this.mnuExit.Text = "Exit";
-            this.mnuExit.Click += new System.EventHandler(this.MnuExit_Click);
+            settingsMenu.Index = 1;
+            settingsMenu.MenuItems.AddRange(new System.Windows.Forms.MenuItem[] {
+            this.muteSoundEffectsMenu});
+            settingsMenu.Text = "Settings";
             // 
-            // menuItem3
+            // muteSoundEffectsMenu
             // 
-            this.menuItem3.Index = 1;
-            this.menuItem3.MenuItems.AddRange(new System.Windows.Forms.MenuItem[] {
-            this.mnuMuteSoundEffects});
-            this.menuItem3.Text = "Settings";
+            this.muteSoundEffectsMenu.Index = 0;
+            this.muteSoundEffectsMenu.Text = "Mute Sound Effects";
+            this.muteSoundEffectsMenu.Click += new System.EventHandler(this.MuteSoundEffectsMenu_Click);
             // 
-            // mnuMuteSoundEffects
+            // helpMenu
             // 
-            this.mnuMuteSoundEffects.Index = 0;
-            this.mnuMuteSoundEffects.Text = "Mute Sound Effects";
-            this.mnuMuteSoundEffects.Click += new System.EventHandler(this.MnuMuteSoundEffects_Click);
+            helpMenu.Index = 2;
+            helpMenu.MenuItems.AddRange(new System.Windows.Forms.MenuItem[] {
+            this.aboutMenu});
+            helpMenu.Text = "Help";
             // 
-            // menuItem2
+            // aboutMenu
             // 
-            this.menuItem2.Index = 2;
-            this.menuItem2.MenuItems.AddRange(new System.Windows.Forms.MenuItem[] {
-            this.mnuAbout});
-            this.menuItem2.Text = "Help";
+            this.aboutMenu.Index = 0;
+            this.aboutMenu.Text = "About";
+            this.aboutMenu.Click += new System.EventHandler(this.AboutMenu_Click);
             // 
-            // mnuAbout
+            // mainMenu
             // 
-            this.mnuAbout.Index = 0;
-            this.mnuAbout.Text = "About";
-            this.mnuAbout.Click += new System.EventHandler(this.MnuAbout_Click);
+            this.mainMenu.MenuItems.AddRange(new System.Windows.Forms.MenuItem[] {
+            fileMenu,
+            settingsMenu,
+            helpMenu});
             // 
-            // connectFourGameContainer
+            // connectFourControl
             // 
-            this.connectFourGameContainer.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.connectFourGameContainer.Location = new System.Drawing.Point(0, 0);
-            this.connectFourGameContainer.Name = "connectFourGameContainer";
-            this.connectFourGameContainer.Size = new System.Drawing.Size(924, 603);
-            this.connectFourGameContainer.TabIndex = 0;
-            this.connectFourGameContainer.Text = "connectFourGameContainer1";
+            this.connectFourControl.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.connectFourControl.IsSoundMuted = false;
+            this.connectFourControl.Location = new System.Drawing.Point(0, 0);
+            this.connectFourControl.Name = "connectFourControl";
+            this.connectFourControl.Size = new System.Drawing.Size(1406, 716);
             // 
             // MainForm
             // 
-            this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
-            this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(924, 603);
-            this.Controls.Add(this.connectFourGameContainer);
+            this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.None;
+            this.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
+            this.ClientSize = new System.Drawing.Size(1406, 716);
+            this.Controls.Add(this.connectFourControl);
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
-            this.Menu = this.mainMenu1;
+            this.Margin = new System.Windows.Forms.Padding(4);
+            this.MaximizeBox = false;
+            this.Menu = this.mainMenu;
             this.Name = "MainForm";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             this.Text = "Connect Four - By: Darian Benam";
+            this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.MainForm_FormClosing);
             this.ResumeLayout(false);
 
         }
 
         #endregion
-
-        private ConnectFourGameContainer connectFourGameContainer;
-        private System.Windows.Forms.MainMenu mainMenu1;
-        private System.Windows.Forms.MenuItem menuItem1;
-        private System.Windows.Forms.MenuItem menuItem2;
-        private System.Windows.Forms.MenuItem mnuNewGame;
-        private System.Windows.Forms.MenuItem menuItem5;
-        private System.Windows.Forms.MenuItem mnuExit;
-        private System.Windows.Forms.MenuItem menuItem3;
-        private System.Windows.Forms.MenuItem mnuMuteSoundEffects;
-        private System.Windows.Forms.MenuItem mnuAbout;
+        private System.Windows.Forms.MainMenu mainMenu;
+        private System.Windows.Forms.MenuItem startNewGameMenu;
+        private System.Windows.Forms.MenuItem seperatorMenu;
+        private System.Windows.Forms.MenuItem exitMenu;
+        private System.Windows.Forms.MenuItem muteSoundEffectsMenu;
+        private Game.WindowsControls.ConnectFour connectFourControl;
+        private System.Windows.Forms.MenuItem aboutMenu;
     }
 }
 
