@@ -245,7 +245,7 @@ namespace ConnectFour.Game
                 throw new InvalidEnumArgumentException("The chip is invalid!");
             }
 
-            gameBoardChips[GetAvailableRow(column), column] = chip;
+            gameBoardChips[GetNextAvailableRow(column), column] = chip;
 
             OnChipPlaced?.Invoke(this);
 
@@ -339,7 +339,7 @@ namespace ConnectFour.Game
         /// </summary>
         /// <param name="column">The column to find the next available row.</param>
         /// <returns>An int greater than or equal to zero if an available row is found in the column, if not, -1 is returned.</returns>
-        private int GetAvailableRow(int column)
+        private int GetNextAvailableRow(int column)
         {
             for (int row = Rows - 1; row >= 0; row--)
             {
