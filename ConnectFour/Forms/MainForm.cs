@@ -40,7 +40,7 @@ namespace ConnectFour.Forms
         }
         
         /// <summary>
-        /// 
+        /// Shows a message box to the user asking them if they want to exit out the <see cref="MainForm"/> or not. The message box has two buttons, yes and no.
         /// </summary>
         /// <returns>True if the user wants to exit out of the form, if not, false.</returns>
         private bool ConfirmExitWithUser()
@@ -94,7 +94,7 @@ namespace ConnectFour.Forms
         }
 
         /// <summary>
-        /// 
+        /// Event handler for when the <see cref="MainForm"/> is closing.
         /// </summary>
         /// <param name="sender">The object that raised the event.</param>
         /// <param name="e">The data about the event.</param>
