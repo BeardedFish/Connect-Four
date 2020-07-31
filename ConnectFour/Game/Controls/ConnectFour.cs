@@ -76,6 +76,10 @@ namespace ConnectFour.Game.WindowsControls
         public delegate void OnClickedFullColumnHandler(object sender);
         public event OnClickedFullColumnHandler OnClickedFullColumn;
 
+        /// <summary>
+        /// Control that provdides a GUI interface for the <see cref="ConnectFourBoard"/> object. All graphics for the control are drawn
+        /// via GDI+.
+        /// </summary>
         public ConnectFour()
         {
             Cursor = Cursors.Default;
