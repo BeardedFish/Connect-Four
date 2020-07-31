@@ -1,4 +1,4 @@
-﻿// File Name:     ConnectFourContainer.cs
+// File Name:     ConnectFourContainer.cs
 // By:            Darian Benam (GitHub: https://github.com/BeardedFish/)
 // Date:          Thursday, July 23, 2020
 
@@ -25,7 +25,7 @@ namespace ConnectFour.Game.WindowsControls
         /// <summary>
         /// The horizontal offset for the table that the Connect Four game board sits on.
         /// </summary>
-        public const int TableHorizontalOffset = 50;
+        public const int TableHorizontalOffset = 150;
 
         /// <summary>
         /// States whether the game sound effects are muted or not.
