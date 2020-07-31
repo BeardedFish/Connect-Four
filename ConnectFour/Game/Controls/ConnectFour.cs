@@ -205,7 +205,7 @@ namespace ConnectFour.Game.WindowsControls
             {
                 GameBoard.StartNewGame(false);
             }
-            else if (!GameBoard.IsColumnAvailable(CurrentHoveredColumn))
+            else if (!GameBoard.IsColumnAvailable(CurrentHoveredColumn) && !GameBoard.IsComputerTurn)
             {
                 OnClickedFullColumn?.Invoke(this);
             }
