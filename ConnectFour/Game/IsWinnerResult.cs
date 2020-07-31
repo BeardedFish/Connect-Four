@@ -20,7 +20,8 @@ namespace ConnectFour.Game
         public List<Point> WinningLocations { get; private set; }
 
         /// <summary>
-        /// 
+        /// Constructor for creating an <see cref="IsWinnerResult"/> object which serves as the return type for the <see cref="ConnectFourBoard.IsWinner(Enums.Chip)"/>
+        /// method.
         /// </summary>
         /// <param name="playerWon">Refer to <see cref="PlayerWon"/> for description.</param>
         /// <param name="winningLocations">Refer to <see cref="WinningLocations"/> for description.</param>
