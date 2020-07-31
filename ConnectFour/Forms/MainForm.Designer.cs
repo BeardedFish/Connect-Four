@@ -33,34 +33,30 @@ namespace ConnectFour.Forms
         private void InitializeComponent()
         {
             this.components = new System.ComponentModel.Container();
+            System.Windows.Forms.MenuItem fileMenu;
+            System.Windows.Forms.MenuItem settingsMenu;
+            System.Windows.Forms.MenuItem helpMenu;
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(MainForm));
-            this.mainMenu = new System.Windows.Forms.MainMenu(this.components);
-            this.menuItem1 = new System.Windows.Forms.MenuItem();
             this.startNewGameMenu = new System.Windows.Forms.MenuItem();
             this.seperatorMenu = new System.Windows.Forms.MenuItem();
             this.exitMenu = new System.Windows.Forms.MenuItem();
-            this.menuItem2 = new System.Windows.Forms.MenuItem();
             this.muteSoundEffectsMenu = new System.Windows.Forms.MenuItem();
-            this.HelpMenu = new System.Windows.Forms.MenuItem();
             this.aboutMenu = new System.Windows.Forms.MenuItem();
+            this.mainMenu = new System.Windows.Forms.MainMenu(this.components);
             this.connectFourControl = new ConnectFour.Game.WindowsControls.ConnectFour();
+            fileMenu = new System.Windows.Forms.MenuItem();
+            settingsMenu = new System.Windows.Forms.MenuItem();
+            helpMenu = new System.Windows.Forms.MenuItem();
             this.SuspendLayout();
             // 
-            // mainMenu
+            // fileMenu
             // 
-            this.mainMenu.MenuItems.AddRange(new System.Windows.Forms.MenuItem[] {
-            this.menuItem1,
-            this.menuItem2,
-            this.HelpMenu});
-            // 
-            // menuItem1
-            // 
-            this.menuItem1.Index = 0;
-            this.menuItem1.MenuItems.AddRange(new System.Windows.Forms.MenuItem[] {
+            fileMenu.Index = 0;
+            fileMenu.MenuItems.AddRange(new System.Windows.Forms.MenuItem[] {
             this.startNewGameMenu,
             this.seperatorMenu,
             this.exitMenu});
-            this.menuItem1.Text = "File";
+            fileMenu.Text = "File";
             // 
             // startNewGameMenu
             // 
@@ -79,12 +75,12 @@ namespace ConnectFour.Forms
             this.exitMenu.Text = "Exit";
             this.exitMenu.Click += new System.EventHandler(this.ExitMenu_Click);
             // 
-            // menuItem2
+            // settingsMenu
             // 
-            this.menuItem2.Index = 1;
-            this.menuItem2.MenuItems.AddRange(new System.Windows.Forms.MenuItem[] {
+            settingsMenu.Index = 1;
+            settingsMenu.MenuItems.AddRange(new System.Windows.Forms.MenuItem[] {
             this.muteSoundEffectsMenu});
-            this.menuItem2.Text = "Settings";
+            settingsMenu.Text = "Settings";
             // 
             // muteSoundEffectsMenu
             // 
@@ -92,12 +88,12 @@ namespace ConnectFour.Forms
             this.muteSoundEffectsMenu.Text = "Mute Sound Effects";
             this.muteSoundEffectsMenu.Click += new System.EventHandler(this.MuteSoundEffectsMenu_Click);
             // 
-            // HelpMenu
+            // helpMenu
             // 
-            this.HelpMenu.Index = 2;
-            this.HelpMenu.MenuItems.AddRange(new System.Windows.Forms.MenuItem[] {
+            helpMenu.Index = 2;
+            helpMenu.MenuItems.AddRange(new System.Windows.Forms.MenuItem[] {
             this.aboutMenu});
-            this.HelpMenu.Text = "Help";
+            helpMenu.Text = "Help";
             // 
             // aboutMenu
             // 
@@ -105,19 +101,26 @@ namespace ConnectFour.Forms
             this.aboutMenu.Text = "About";
             this.aboutMenu.Click += new System.EventHandler(this.AboutMenu_Click);
             // 
+            // mainMenu
+            // 
+            this.mainMenu.MenuItems.AddRange(new System.Windows.Forms.MenuItem[] {
+            fileMenu,
+            settingsMenu,
+            helpMenu});
+            // 
             // connectFourControl
             // 
             this.connectFourControl.Dock = System.Windows.Forms.DockStyle.Fill;
             this.connectFourControl.IsSoundMuted = false;
             this.connectFourControl.Location = new System.Drawing.Point(0, 0);
             this.connectFourControl.Name = "connectFourControl";
-            this.connectFourControl.Size = new System.Drawing.Size(1406, 786);
+            this.connectFourControl.Size = new System.Drawing.Size(1406, 716);
             // 
             // MainForm
             // 
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.None;
             this.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
-            this.ClientSize = new System.Drawing.Size(1406, 786);
+            this.ClientSize = new System.Drawing.Size(1406, 716);
             this.Controls.Add(this.connectFourControl);
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.Margin = new System.Windows.Forms.Padding(4);
@@ -133,14 +136,11 @@ namespace ConnectFour.Forms
 
         #endregion
         private System.Windows.Forms.MainMenu mainMenu;
-        private System.Windows.Forms.MenuItem menuItem1;
         private System.Windows.Forms.MenuItem startNewGameMenu;
         private System.Windows.Forms.MenuItem seperatorMenu;
         private System.Windows.Forms.MenuItem exitMenu;
-        private System.Windows.Forms.MenuItem menuItem2;
         private System.Windows.Forms.MenuItem muteSoundEffectsMenu;
         private Game.WindowsControls.ConnectFour connectFourControl;
-        private System.Windows.Forms.MenuItem HelpMenu;
         private System.Windows.Forms.MenuItem aboutMenu;
     }
 }
