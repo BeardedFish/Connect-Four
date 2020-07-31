@@ -135,7 +135,18 @@ namespace ConnectFour.Forms
         /// <param name="gameOutcome"></param>
         private void GameBoard_OnGameOver(object sender, GameOutcome gameOutcome)
         {
-            
+            string suffixText;
+
+            if (gameOutcome == GameOutcome.RedChipWon || gameOutcome == GameOutcome.YellowChipWon)
+            {
+                suffixText = $"{(gameOutcome == GameOutcome.RedChipWon ? "Red" : "Yellow")} player has won.";
+            }
+            else
+            {
+                suffixText = "Game ended in a tie.";
+            }
+
+            UpdateTitle("Game Over! " + suffixText);
         }
 
         /// <summary>
