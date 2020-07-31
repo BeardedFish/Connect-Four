@@ -268,14 +268,9 @@ namespace ConnectFour.Game
         {
             GameStatus gameResult = CurrentGameStatus;
 
-            if (gameResult == GameStatus.RedChipWon)
+            if (gameResult == GameStatus.RedChipWon || gameResult == GameStatus.YellowChipWon)
             {
-                Scores[Chip.Red]++;
-            }
-            
-            if (gameResult == GameStatus.YellowChipWon)
-            {
-                Scores[Chip.Yellow]++;
+                Scores[gameResult == GameStatus.RedChipWon ? Chip.Red : Chip.Yellow]++;
             }
         }
 
