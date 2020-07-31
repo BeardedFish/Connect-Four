@@ -289,7 +289,7 @@ namespace ConnectFour.Game.WindowsControls
                 g.FillRectangle(br, gameBoardBounds);
             }
 
-            List<Point> winLocations = GameBoard.GetWinLocations();
+            HashSet<Point> winLocations = GameBoard.GetWinLocations();
             if (winLocations != null)
             {
                 foreach (Point winLocation in winLocations)

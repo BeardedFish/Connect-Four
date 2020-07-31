@@ -17,7 +17,7 @@ namespace ConnectFour.Game
         /// <summary>
         /// States the locations where the chip won. If <see cref="PlayerWon"/> is false, then this will have a length of zero.
         /// </summary>
-        public List<Point> WinningLocations { get; private set; }
+        public HashSet<Point> WinningLocations { get; private set; }
 
         /// <summary>
         /// Constructor for creating an <see cref="IsWinnerResult"/> object which serves as the return type for the <see cref="ConnectFourBoard.IsWinner(Enums.Chip)"/>
@@ -25,7 +25,7 @@ namespace ConnectFour.Game
         /// </summary>
         /// <param name="playerWon">Refer to <see cref="PlayerWon"/> for description.</param>
         /// <param name="winningLocations">Refer to <see cref="WinningLocations"/> for description.</param>
-        public IsWinnerResult(bool playerWon, List<Point> winningLocations)
+        public IsWinnerResult(bool playerWon, HashSet<Point> winningLocations)
         {
             PlayerWon = playerWon;
             WinningLocations = winningLocations;

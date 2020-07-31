@@ -190,7 +190,7 @@ namespace ConnectFour.Game
         /// If the Connect Four board does have a winning player then a <see cref="List{T}"/> of type <see cref="Point"/> is returned. If no player won then null is
         /// returned.
         /// </returns>
-        public List<Point> GetWinLocations()
+        public HashSet<Point> GetWinLocations()
         {
             IsWinnerResult result;
 
@@ -375,7 +375,7 @@ namespace ConnectFour.Game
                 throw new InvalidEnumArgumentException("The chip is invalid!");
             }
 
-            List<Point> winningLocations = new List<Point>();
+            HashSet<Point> winningLocations = new HashSet<Point>();
 
             /*
              * Check horizontally for win.
