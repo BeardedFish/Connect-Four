@@ -2,12 +2,12 @@
 // By:            Darian Benam (GitHub: https://github.com/BeardedFish/)
 // Date:          July, June 23, 2020
 
+using ConnectFour.Game.AI;
 using ConnectFour.Game.Enums;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Drawing;
-using System.Threading.Tasks;
 
 namespace ConnectFour.Game
 {
@@ -32,6 +32,11 @@ namespace ConnectFour.Game
         /// States the current chip's turn. The chip can be either <see cref="Chip.Red"/> or <see cref="Chip.Yellow"/>.
         /// </summary>
         public Chip CurrentChipTurn { get; private set; } = FirstPlayerChip;
+
+        /// <summary>
+        /// The array that holds all the chips values for the Connect Four game board.
+        /// </summary>
+        public readonly Chip[,] Data;
 
         /// <summary>
         /// Dictionary which contains the scores of both the <see cref="Chip.Red"/> player and the <see cref="Chip.Yellow"/> player.
@@ -59,9 +64,9 @@ namespace ConnectFour.Game
         {
             get
             {
-                for (int col = 0; col < gameBoardChips.GetLength(1); col++)
+                for (int col = 0; col < Data.GetLength(1); col++)
                 {
-                    if (gameBoardChips[0, col] == Chip.None)
+                    if (Data[0, col] == Chip.None)
                     {
                         return false;
                     }
@@ -77,7 +82,7 @@ namespace ConnectFour.Game
         /// <param name="row">The row to be accessed.</param>
         /// <param name="col">The column to be accessed</param>
         /// <returns>A <see cref="Chip"/> enum whichrepresents the chip at that column and row position.</returns>
-        public Chip this[int row, int col] => gameBoardChips[row, col];
+        public Chip this[int row, int col] => Data[row, col];
 
         /// <summary>
         /// States the chip that the computer player uses.
@@ -147,16 +152,6 @@ namespace ConnectFour.Game
         private const Chip FirstPlayerChip = Chip.Red;
 
         /// <summary>
-        /// The array that holds all the chips values for the Connect Four game board.
-        /// </summary>
-        private Chip[,] gameBoardChips;
-
-        /// <summary>
-        /// Random object used for generating moves of the computer player.
-        /// </summary>
-        private Random random;
-
-        /// <summary>
         /// Constructor for creating a Connect Four board. The number of columns must be greater than or equal to 7 and the rows must be greater than or equal to
         /// 6. If the columns and rows do not meet those requirements then an exception is thrown.
         /// </summary>
@@ -174,11 +169,9 @@ namespace ConnectFour.Game
                 throw new Exception("The number of columns must be greater than or equal to 6.");
             }
 
+            Data = new Chip[rows, columns];
             Columns = columns;
             Rows = rows;
-
-            gameBoardChips = new Chip[rows, columns];
-            random = new Random();
 
             StartNewGame(false);
         }
@@ -204,7 +197,7 @@ namespace ConnectFour.Game
         /// <returns>True if the column is available, if not, false.</returns>
         public bool IsColumnAvailable(int column)
         {
-            return gameBoardChips[0, column] == Chip.None;
+            return Data[0, column] == Chip.None;
         }
 
         /// <summary>
@@ -227,37 +220,54 @@ namespace ConnectFour.Game
         }
 
         /// <summary>
+        /// Gets the next available row in a column.
+        /// </summary>
+        /// <param name="column">The column to find the next available row.</param>
+        /// <returns>An int greater than or equal to zero if an available row is found in the column, if not, -1 is returned.</returns>
+        public int GetNextAvailableRow(int column)
+        {
+            for (int row = Rows - 1; row >= 0; row--)
+            {
+                if (Data[row, column] == Chip.None)
+                {
+                    return row;
+                }
+            }
+
+            return -1; // -1 means that the column is filled
+        }
+
+        /// <summary>
         /// Places a chip in a specificed column at the next available row. If the column is full, then an exception is thrown. If the chip is of type
         /// <see cref="Chip.None"/>, then an exception is thrown. If the chip place was succesful, then the turns are switches via the <see cref="SwitchTurns"/>
         /// method.
         /// </summary>
         /// <param name="column">The column to place the chip in.</param>
         /// <param name="chip">The chip to be placed in the column.</param>
-        public void PlaceChip(int column, Chip chip)
+        public void PlaceChip(int column, bool checkOutcome)
         {
             if (!IsColumnAvailable(column))
             {
                 throw new Exception($"The column {column} is filled in completely!");
             }
 
-            if (chip == Chip.None)
-            {
-                throw new InvalidEnumArgumentException("The chip is invalid!");
-            }
-
-            gameBoardChips[GetAvailableRow(column), column] = chip;
+            int row = GetNextAvailableRow(column);
+            Data[row, column] = CurrentChipTurn;
 
             OnChipPlaced?.Invoke(this);
 
-            if (IsGameOver)
+            if (checkOutcome)
             {
-                UpdateScore();
+                if (IsGameOver)
+                {
+                    UpdateScore();
 
-                OnGameOver?.Invoke(this, CurrentGameStatus);
-            }
-            else
-            {
-                SwitchTurns();
+                    OnGameOver?.Invoke(this, CurrentGameStatus);
+                }
+                else
+                {
+                    SwitchTurns();
+                }
             }
         }
 
@@ -289,19 +299,8 @@ namespace ConnectFour.Game
                 throw new Exception(!IsOpponentComputer ? "The opponent is not a computer player!" : "It's not the opponents turn!");
             }
 
-            List<int> possibleMoves = GetAvailableColumns();
-
-            if (possibleMoves.Count > 0)
-            {
-                Task.Run(async() =>
-                {
-                    int column = possibleMoves[random.Next(0, possibleMoves.Count - 1)];
-
-                    await Task.Delay(random.Next(500, 1500));
-
-                    PlaceChip(column, Chip.Yellow);
-                });
-            }
+            int bestColumn = ConnectFourAI.GetBestColumn(this);
+            PlaceChip(bestColumn, true);
         }
 
         /// <summary>
@@ -310,11 +309,11 @@ namespace ConnectFour.Game
         public void StartNewGame(bool resetScores)
         {
             // Clear the game board
-            for (int row = 0; row < gameBoardChips.GetLength(0); row++)
+            for (int row = 0; row < Data.GetLength(0); row++)
             {
-                for (int col = 0; col < gameBoardChips.GetLength(1); col++)
+                for (int col = 0; col < Data.GetLength(1); col++)
                 {
-                    gameBoardChips[row, col] = Chip.None;
+                    Data[row, col] = Chip.None;
                 }
             }
 
@@ -332,24 +331,6 @@ namespace ConnectFour.Game
             }
 
             OnNewGame?.Invoke(this);
-        }
-
-        /// <summary>
-        /// Gets the next available row in a column.
-        /// </summary>
-        /// <param name="column">The column to find the next available row.</param>
-        /// <returns>An int greater than or equal to zero if an available row is found in the column, if not, -1 is returned.</returns>
-        private int GetAvailableRow(int column)
-        {
-            for (int row = Rows - 1; row >= 0; row--)
-            {
-                if (gameBoardChips[row, column] == Chip.None)
-                {
-                    return row;
-                }
-            }
-
-            return -1; // -1 means that the column is filled
         }
 
         /// <summary>
@@ -394,14 +375,14 @@ namespace ConnectFour.Game
              * [ ][ ][ ][ ][ ][ ][ ] 4
              * [ ][ ][ ][ ][ ][ ][ ] 5
              */
-            for (int row = 0; row < gameBoardChips.GetLength(0); row++)
+            for (int row = 0; row < Data.GetLength(0); row++)
             {
-                for (int col = 0; col < gameBoardChips.GetLength(1) - 3; col++)
+                for (int col = 0; col < Data.GetLength(1) - 3; col++)
                 {
-                    if (gameBoardChips[row, col] == chip
-                        && gameBoardChips[row, col + 1] == chip
-                        && gameBoardChips[row, col + 2] == chip
-                        && gameBoardChips[row, col + 3] == chip)
+                    if (Data[row, col] == chip
+                        && Data[row, col + 1] == chip
+                        && Data[row, col + 2] == chip
+                        && Data[row, col + 3] == chip)
                     {
                         for (int i = 0; i <= 3; i++)
                         {
@@ -423,14 +404,14 @@ namespace ConnectFour.Game
              * [ ][ ][ ][ ][ ][ ][ ] 4
              * [ ][ ][ ][ ][ ][ ][ ] 5
              */
-            for (int row = 0; row < gameBoardChips.GetLength(0) - 3; row++)
+            for (int row = 0; row < Data.GetLength(0) - 3; row++)
             {
-                for (int col = 0; col < gameBoardChips.GetLength(1); col++)
+                for (int col = 0; col < Data.GetLength(1); col++)
                 {
-                    if (gameBoardChips[row, col] == chip
-                        && gameBoardChips[row + 1, col] == chip
-                        && gameBoardChips[row + 2, col] == chip
-                        && gameBoardChips[row + 3, col] == chip)
+                    if (Data[row, col] == chip
+                        && Data[row + 1, col] == chip
+                        && Data[row + 2, col] == chip
+                        && Data[row + 3, col] == chip)
                     {
                         for (int i = 0; i <= 3; i++)
                         {
@@ -452,14 +433,14 @@ namespace ConnectFour.Game
              * [ ][ ][ ][ ][ ][ ][ ] 4
              * [ ][ ][ ][ ][ ][ ][ ] 5
              */
-            for (int row = 0; row < gameBoardChips.GetLength(0) - 3; row++)
+            for (int row = 0; row < Data.GetLength(0) - 3; row++)
             {
-                for (int col = 0; col < gameBoardChips.GetLength(1) - 3; col++)
+                for (int col = 0; col < Data.GetLength(1) - 3; col++)
                 {
-                    if (gameBoardChips[row, col] == chip
-                        && gameBoardChips[row + 1, col + 1] == chip
-                        && gameBoardChips[row + 2, col + 2] == chip
-                        && gameBoardChips[row + 3, col + 3] == chip)
+                    if (Data[row, col] == chip
+                        && Data[row + 1, col + 1] == chip
+                        && Data[row + 2, col + 2] == chip
+                        && Data[row + 3, col + 3] == chip)
                     {
                         for (int i = 0; i <= 3; i++)
                         {
@@ -481,14 +462,14 @@ namespace ConnectFour.Game
              * [ ][ ][ ][ ][ ][ ][ ] 4
              * [ ][ ][ ][ ][ ][ ][ ] 5
              */
-            for (int row = 0; row < gameBoardChips.GetLength(0) - 3; row++)
+            for (int row = 0; row < Data.GetLength(0) - 3; row++)
             {
-                for (int col = gameBoardChips.GetLength(1) - 1; col >= 3; col--)
+                for (int col = Data.GetLength(1) - 1; col >= 3; col--)
                 {
-                    if (gameBoardChips[row, col] == chip
-                        && gameBoardChips[row + 1, col - 1] == chip
-                        && gameBoardChips[row + 2, col - 2] == chip
-                        && gameBoardChips[row + 3, col - 3] == chip)
+                    if (Data[row, col] == chip
+                        && Data[row + 1, col - 1] == chip
+                        && Data[row + 2, col - 2] == chip
+                        && Data[row + 3, col - 3] == chip)
                     {
                         for (int i = 0; i <= 3; i++)
                         {

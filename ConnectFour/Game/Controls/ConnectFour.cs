@@ -206,7 +206,7 @@ namespace ConnectFour.Game.WindowsControls
             {
                 if (!GameBoard.IsComputerTurn)
                 {
-                    GameBoard.PlaceChip(CurrentHoveredColumn, GameBoard.CurrentChipTurn);
+                    GameBoard.PlaceChip(CurrentHoveredColumn, true);
                 }
             }
         }
