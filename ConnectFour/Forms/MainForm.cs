@@ -38,6 +38,7 @@ namespace ConnectFour.Forms
 
             Size = new Size(FormWidth, FormHeight);
             prefixFormTitle = Text;
+            connectFourControl.IsSoundMuted = muteSoundEffectsMenu.Checked = Settings.Default.IsSoundMuted;
         }
         
         /// <summary>
@@ -108,6 +109,9 @@ namespace ConnectFour.Forms
                     e.Cancel = true;
                 }
             }
+
+            // Save the settings
+            Settings.Default.Save();
         }
 
         #region Connect Four Game Event Handlers
@@ -223,7 +227,7 @@ namespace ConnectFour.Forms
         /// <param name="e">The data about the event.</param>
         private void MuteSoundEffectsMenu_Click(object sender, EventArgs e)
         {
-            connectFourControl.IsSoundMuted = !connectFourControl.IsSoundMuted;
+            connectFourControl.IsSoundMuted = Settings.Default.IsSoundMuted = !connectFourControl.IsSoundMuted;
 
             muteSoundEffectsMenu.Checked = connectFourControl.IsSoundMuted;
         }

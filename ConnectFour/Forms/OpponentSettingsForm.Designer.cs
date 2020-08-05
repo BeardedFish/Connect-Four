@@ -35,7 +35,7 @@ namespace ConnectFour.Forms
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(OpponentSettingsForm));
             this.opponentTypeComboBox = new System.Windows.Forms.ComboBox();
             this.typeLabel = new System.Windows.Forms.Label();
-            this.saveChangesButton = new System.Windows.Forms.Button();
+            this.applyChangesButton = new System.Windows.Forms.Button();
             this.buttonPanel = new System.Windows.Forms.Panel();
             this.chipLabel = new System.Windows.Forms.Label();
             this.opponentChipComboBox = new System.Windows.Forms.ComboBox();
@@ -65,22 +65,22 @@ namespace ConnectFour.Forms
             this.typeLabel.TabIndex = 0;
             this.typeLabel.Text = "Type:";
             // 
-            // saveChangesButton
+            // applyChangesButton
             // 
-            this.saveChangesButton.Enabled = false;
-            this.saveChangesButton.Location = new System.Drawing.Point(427, 25);
-            this.saveChangesButton.Margin = new System.Windows.Forms.Padding(15);
-            this.saveChangesButton.Name = "saveChangesButton";
-            this.saveChangesButton.Size = new System.Drawing.Size(175, 40);
-            this.saveChangesButton.TabIndex = 2;
-            this.saveChangesButton.Text = "Save Changes";
-            this.saveChangesButton.UseVisualStyleBackColor = true;
-            this.saveChangesButton.Click += new System.EventHandler(this.SaveChangesButton_Click);
+            this.applyChangesButton.Enabled = false;
+            this.applyChangesButton.Location = new System.Drawing.Point(427, 25);
+            this.applyChangesButton.Margin = new System.Windows.Forms.Padding(15);
+            this.applyChangesButton.Name = "applyChangesButton";
+            this.applyChangesButton.Size = new System.Drawing.Size(175, 40);
+            this.applyChangesButton.TabIndex = 2;
+            this.applyChangesButton.Text = "Apply Changes";
+            this.applyChangesButton.UseVisualStyleBackColor = true;
+            this.applyChangesButton.Click += new System.EventHandler(this.ApplyChangesButton_Click);
             // 
             // buttonPanel
             // 
             this.buttonPanel.BackColor = System.Drawing.SystemColors.ControlLight;
-            this.buttonPanel.Controls.Add(this.saveChangesButton);
+            this.buttonPanel.Controls.Add(this.applyChangesButton);
             this.buttonPanel.Dock = System.Windows.Forms.DockStyle.Bottom;
             this.buttonPanel.Location = new System.Drawing.Point(0, 112);
             this.buttonPanel.Name = "buttonPanel";
@@ -136,7 +136,7 @@ namespace ConnectFour.Forms
         #endregion
         private System.Windows.Forms.Label typeLabel;
         private System.Windows.Forms.ComboBox opponentTypeComboBox;
-        private System.Windows.Forms.Button saveChangesButton;
+        private System.Windows.Forms.Button applyChangesButton;
         private System.Windows.Forms.Panel buttonPanel;
         private System.Windows.Forms.Label chipLabel;
         private System.Windows.Forms.ComboBox opponentChipComboBox;

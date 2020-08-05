@@ -62,22 +62,9 @@ namespace ConnectFour.Forms
             opponentChipComboBox.Text = initialOpponentChipText = (Settings.Default.IsOpponentChipYellow ? opponentChipComboBox.Items[YellowChipComboBoxIndex] : opponentChipComboBox.Items[RedChipComboBoxIndex]).ToString();
         }
 
-        /// <summary>
-        /// Saves the settings to the <see cref="Settings"/> class.
-        /// </summary>
-        private void SaveSettings()
-        {
-            Settings.Default.IsOpponentComputer = opponentTypeComboBox.SelectedIndex == CpuComboBoxIndex;
-            Settings.Default.IsOpponentChipYellow = opponentTypeComboBox.SelectedIndex == YellowChipComboBoxIndex;
-            Settings.Default.Save();
-
-            initialOpponentTypeText = opponentTypeComboBox.Text;
-            initialOpponentChipText = opponentChipComboBox.Text;
-        }
-
         private void ComboBoxIndexChangedEventHandler(object sender, EventArgs e)
         {
-            saveChangesButton.Enabled = SettingsModified;
+            applyChangesButton.Enabled = SettingsModified;
         }
 
         /// <summary>
@@ -102,16 +89,20 @@ namespace ConnectFour.Forms
         }
 
         /// <summary>
-        /// Event handler for when the <see cref="saveChangesButton"/> is clicked.
+        /// Event handler for when the <see cref="applyChangesButton"/> is clicked.
         /// </summary>
         /// <param name="sender">The object that raised the event.</param>
         /// <param name="e">The object that contains data about the event.</param>
-        private void SaveChangesButton_Click(object sender, EventArgs e)
+        private void ApplyChangesButton_Click(object sender, EventArgs e)
         {
-            SaveSettings();
+            Settings.Default.IsOpponentComputer = opponentTypeComboBox.SelectedIndex == CpuComboBoxIndex;
+            Settings.Default.IsOpponentChipYellow = opponentTypeComboBox.SelectedIndex == YellowChipComboBoxIndex;
+            initialOpponentTypeText = opponentTypeComboBox.Text;
+            initialOpponentChipText = opponentChipComboBox.Text;
+
             ComboBoxIndexChangedEventHandler(this, null);
 
-            MessageBox.Show("Changes will occur when the current Connect Four game ends.",
+            MessageBox.Show("Changes will take effect when the current Connect Four game ends.",
                 "Information",
                 MessageBoxButtons.OK,
                 MessageBoxIcon.Information);

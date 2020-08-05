@@ -122,13 +122,13 @@ namespace ConnectFour.Forms
             this.connectFourControl.IsSoundMuted = false;
             this.connectFourControl.Location = new System.Drawing.Point(0, 0);
             this.connectFourControl.Name = "connectFourControl";
-            this.connectFourControl.Size = new System.Drawing.Size(1406, 611);
+            this.connectFourControl.Size = new System.Drawing.Size(1406, 856);
             // 
             // MainForm
             // 
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.None;
             this.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
-            this.ClientSize = new System.Drawing.Size(1406, 611);
+            this.ClientSize = new System.Drawing.Size(1406, 856);
             this.Controls.Add(this.connectFourControl);
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.Margin = new System.Windows.Forms.Padding(4);
