@@ -52,10 +52,10 @@ namespace ConnectFour.Forms
             // 
             // okButton
             // 
-            this.okButton.Location = new System.Drawing.Point(582, 17);
+            this.okButton.Location = new System.Drawing.Point(582, 20);
             this.okButton.Margin = new System.Windows.Forms.Padding(10);
             this.okButton.Name = "okButton";
-            this.okButton.Size = new System.Drawing.Size(125, 45);
+            this.okButton.Size = new System.Drawing.Size(125, 40);
             this.okButton.TabIndex = 1;
             this.okButton.Text = "Ok";
             this.okButton.UseVisualStyleBackColor = true;
@@ -66,7 +66,7 @@ namespace ConnectFour.Forms
             this.informationTextBox.BackColor = System.Drawing.Color.White;
             this.informationTextBox.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
             this.informationTextBox.DetectUrls = false;
-            this.informationTextBox.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.857143F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.informationTextBox.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.informationTextBox.Location = new System.Drawing.Point(19, 21);
             this.informationTextBox.Name = "informationTextBox";
             this.informationTextBox.ReadOnly = true;
