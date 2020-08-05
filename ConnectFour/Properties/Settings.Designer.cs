@@ -22,5 +22,29 @@ namespace ConnectFour.Properties {
                 return defaultInstance;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("True")]
+        public bool IsOpponentComputer {
+            get {
+                return ((bool)(this["IsOpponentComputer"]));
+            }
+            set {
+                this["IsOpponentComputer"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("True")]
+        public bool IsOpponentChipYellow {
+            get {
+                return ((bool)(this["IsOpponentChipYellow"]));
+            }
+            set {
+                this["IsOpponentChipYellow"] = value;
+            }
+        }
     }
 }

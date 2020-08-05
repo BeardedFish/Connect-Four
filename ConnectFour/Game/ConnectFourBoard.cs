@@ -3,6 +3,7 @@
 // Date:          July, June 23, 2020
 
 using ConnectFour.Game.Enums;
+using ConnectFour.Properties;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -13,10 +14,7 @@ namespace ConnectFour.Game
 {
     public sealed class ConnectFourBoard
     {
-        /// <summary>
-        /// States whether the opponent player (yellow chip) is a computer or not.
-        /// </summary>
-        public bool IsOpponentComputer = true;
+        private Chip _firstPlayerChip;
 
         /// <summary>
         /// States the number of columns the Connect Four board has.
@@ -29,9 +27,34 @@ namespace ConnectFour.Game
         public readonly int Rows;
 
         /// <summary>
+        /// States the main human player Connect Four chip.
+        /// </summary>
+        public Chip FirstPlayerChip
+        {
+            get
+            {
+                return _firstPlayerChip;
+            }
+            set
+            {
+                if (value == Chip.None)
+                {
+                    throw new Exception("Invalid chip!");
+                }
+
+                /*if (!IsGameOver)
+                {
+                    throw new Exception("The first player chip cannot be changed unless the Connect Four game is over!");
+                }*/
+
+                _firstPlayerChip = value;
+            }
+        }
+
+        /// <summary>
         /// States the current chip's turn. The chip can be either <see cref="Chip.Red"/> or <see cref="Chip.Yellow"/>.
         /// </summary>
-        public Chip CurrentChipTurn { get; private set; } = FirstPlayerChip;
+        public Chip CurrentChipTurn { get; set; }
 
         /// <summary>
         /// Dictionary which contains the scores of both the <see cref="Chip.Red"/> player and the <see cref="Chip.Yellow"/> player.
@@ -41,6 +64,11 @@ namespace ConnectFour.Game
             { Chip.Red, 0 },
             { Chip.Yellow, 0 }
         };
+
+        /// <summary>
+        /// States whether the opponent player (yellow chip) is a computer or not.
+        /// </summary>
+        public bool IsOpponentComputer { get; set; } = true;
 
         /// <summary>
         /// States whether it is the computer players turn or not.
@@ -142,11 +170,6 @@ namespace ConnectFour.Game
         public event OnSwitchTurnHandler OnSwitchTurn;
 
         /// <summary>
-        /// States the main human player Connect Four chip.
-        /// </summary>
-        private const Chip FirstPlayerChip = Chip.Red;
-
-        /// <summary>
         /// The array that holds all the chips values for the Connect Four game board.
         /// </summary>
         private Chip[,] gameBoardChips;
@@ -174,8 +197,11 @@ namespace ConnectFour.Game
                 throw new Exception("The number of columns must be greater than or equal to 6.");
             }
 
+            HandleSettingChanges();
+
             Columns = columns;
             Rows = rows;
+            CurrentChipTurn = FirstPlayerChip;
 
             gameBoardChips = new Chip[rows, columns];
             random = new Random();
@@ -252,6 +278,7 @@ namespace ConnectFour.Game
             if (IsGameOver)
             {
                 UpdateScore();
+                HandleSettingChanges(); // Setting changes can only occur when the game is over
 
                 OnGameOver?.Invoke(this, CurrentGameStatus);
             }
@@ -259,6 +286,15 @@ namespace ConnectFour.Game
             {
                 SwitchTurns();
             }
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        private void HandleSettingChanges()
+        {
+            IsOpponentComputer = Settings.Default.IsOpponentComputer;
+            FirstPlayerChip = Settings.Default.IsOpponentChipYellow ? Chip.Red : Chip.Yellow;
         }
 
         /// <summary>
@@ -294,7 +330,7 @@ namespace ConnectFour.Game
 
                     await Task.Delay(random.Next(500, 1500));
 
-                    PlaceChip(column, Chip.Yellow);
+                    PlaceChip(column, ComputerPlayerChip);
                 });
             }
         }

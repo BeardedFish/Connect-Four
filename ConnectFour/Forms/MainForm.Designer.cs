@@ -41,6 +41,7 @@ namespace ConnectFour.Forms
             this.seperatorMenu = new System.Windows.Forms.MenuItem();
             this.exitMenu = new System.Windows.Forms.MenuItem();
             this.muteSoundEffectsMenu = new System.Windows.Forms.MenuItem();
+            this.opponentMenu = new System.Windows.Forms.MenuItem();
             this.aboutMenu = new System.Windows.Forms.MenuItem();
             this.mainMenu = new System.Windows.Forms.MainMenu(this.components);
             this.connectFourControl = new ConnectFour.Game.WindowsControls.ConnectFour();
@@ -79,7 +80,8 @@ namespace ConnectFour.Forms
             // 
             settingsMenu.Index = 1;
             settingsMenu.MenuItems.AddRange(new System.Windows.Forms.MenuItem[] {
-            this.muteSoundEffectsMenu});
+            this.muteSoundEffectsMenu,
+            this.opponentMenu});
             settingsMenu.Text = "Settings";
             // 
             // muteSoundEffectsMenu
@@ -87,6 +89,12 @@ namespace ConnectFour.Forms
             this.muteSoundEffectsMenu.Index = 0;
             this.muteSoundEffectsMenu.Text = "Mute Sound Effects";
             this.muteSoundEffectsMenu.Click += new System.EventHandler(this.MuteSoundEffectsMenu_Click);
+            // 
+            // opponentMenu
+            // 
+            this.opponentMenu.Index = 1;
+            this.opponentMenu.Text = "Opponent";
+            this.opponentMenu.Click += new System.EventHandler(this.OpponentMenu_Click);
             // 
             // helpMenu
             // 
@@ -114,13 +122,13 @@ namespace ConnectFour.Forms
             this.connectFourControl.IsSoundMuted = false;
             this.connectFourControl.Location = new System.Drawing.Point(0, 0);
             this.connectFourControl.Name = "connectFourControl";
-            this.connectFourControl.Size = new System.Drawing.Size(1406, 716);
+            this.connectFourControl.Size = new System.Drawing.Size(1406, 611);
             // 
             // MainForm
             // 
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.None;
             this.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
-            this.ClientSize = new System.Drawing.Size(1406, 716);
+            this.ClientSize = new System.Drawing.Size(1406, 611);
             this.Controls.Add(this.connectFourControl);
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.Margin = new System.Windows.Forms.Padding(4);
@@ -142,6 +150,7 @@ namespace ConnectFour.Forms
         private System.Windows.Forms.MenuItem muteSoundEffectsMenu;
         private Game.WindowsControls.ConnectFour connectFourControl;
         private System.Windows.Forms.MenuItem aboutMenu;
+        private System.Windows.Forms.MenuItem opponentMenu;
     }
 }
 

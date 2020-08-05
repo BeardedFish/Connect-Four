@@ -3,6 +3,7 @@
 // Date:          Monday, July 27, 2020
 
 using ConnectFour.Game.Enums;
+using ConnectFour.Properties;
 using System;
 using System.Drawing;
 using System.Windows.Forms;
@@ -203,6 +204,16 @@ namespace ConnectFour.Forms
         private void AboutMenu_Click(object sender, EventArgs e)
         {
             _ = new AboutForm().ShowDialog();
+        }
+
+        /// <summary>
+        /// Event handler for when the <see cref="opponentMenu"/> is clicked.
+        /// </summary>
+        /// <param name="sender">The object that raised the event.</param>
+        /// <param name="e">The data about the event.</param>
+        private void OpponentMenu_Click(object sender, EventArgs e)
+        {
+            _ = new OpponentSettingsForm().ShowDialog();
         }
 
         /// <summary>
