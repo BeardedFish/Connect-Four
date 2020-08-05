@@ -39,6 +39,8 @@ namespace ConnectFour.Forms
             Size = new Size(FormWidth, FormHeight);
             prefixFormTitle = Text;
             connectFourControl.IsSoundMuted = muteSoundEffectsMenu.Checked = Settings.Default.IsSoundMuted;
+
+            UpdateTitleWithCurrentTurn();
         }
         
         /// <summary>
