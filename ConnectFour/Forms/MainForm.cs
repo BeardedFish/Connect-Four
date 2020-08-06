@@ -49,12 +49,10 @@ namespace ConnectFour.Forms
         /// <returns>True if the user wants to exit out of the form, if not, false.</returns>
         private bool ConfirmExitWithUser()
         {
-            DialogResult dialogResult = MessageBox.Show("Are you sure you want to exit out of the Connect Four game?",
+            return MessageBox.Show("Are you sure you want to exit out of the Connect Four game?",
                 "Confirm",
                 MessageBoxButtons.YesNo,
-                MessageBoxIcon.Warning);
-
-            return dialogResult == DialogResult.Yes;
+                MessageBoxIcon.Warning) == DialogResult.Yes;
         }
 
         /// <summary>
