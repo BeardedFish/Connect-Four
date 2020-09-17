@@ -14,8 +14,6 @@ namespace ConnectFour.Game
 {
     public sealed class ConnectFourBoard
     {
-        private Chip _firstPlayerChip;
-
         /// <summary>
         /// States the number of columns the Connect Four board has.
         /// </summary>
@@ -29,6 +27,7 @@ namespace ConnectFour.Game
         /// <summary>
         /// States the main human player Connect Four chip.
         /// </summary>
+        private Chip _firstPlayerChip;
         public Chip FirstPlayerChip
         {
             get
