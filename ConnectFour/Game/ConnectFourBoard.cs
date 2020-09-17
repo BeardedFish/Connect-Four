@@ -351,8 +351,7 @@ namespace ConnectFour.Game
             // Reset both the red player and the yellow player scores
             if (resetScores)
             {
-                Scores[Chip.Red] = 0;
-                Scores[Chip.Yellow] = 0;
+                Scores[Chip.Red] = Scores[Chip.Yellow] = 0;
             }
 
             // Make the computer do their move if it's their turn
