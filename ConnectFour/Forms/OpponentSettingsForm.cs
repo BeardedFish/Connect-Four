@@ -97,6 +97,7 @@ namespace ConnectFour.Forms
         {
             Settings.Default.IsOpponentComputer = opponentTypeComboBox.SelectedIndex == CpuComboBoxIndex;
             Settings.Default.IsOpponentChipYellow = opponentChipComboBox.SelectedIndex == YellowChipComboBoxIndex;
+
             initialOpponentTypeText = opponentTypeComboBox.Text;
             initialOpponentChipText = opponentChipComboBox.Text;
 
