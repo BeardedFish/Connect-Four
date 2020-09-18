@@ -1,4 +1,4 @@
-﻿// File Name:     OpponentSettingsForm.cs
+// File Name:     OpponentSettingsForm.cs
 // By:            Darian Benam (GitHub: https://github.com/BeardedFish/)
 // Date:          Tuesday, August 4, 2020
 
@@ -96,7 +96,7 @@ namespace ConnectFour.Forms
         private void ApplyChangesButton_Click(object sender, EventArgs e)
         {
             Settings.Default.IsOpponentComputer = opponentTypeComboBox.SelectedIndex == CpuComboBoxIndex;
-            Settings.Default.IsOpponentChipYellow = opponentTypeComboBox.SelectedIndex == YellowChipComboBoxIndex;
+            Settings.Default.IsOpponentChipYellow = opponentChipComboBox.SelectedIndex == YellowChipComboBoxIndex;
             initialOpponentTypeText = opponentTypeComboBox.Text;
             initialOpponentChipText = opponentChipComboBox.Text;
 
