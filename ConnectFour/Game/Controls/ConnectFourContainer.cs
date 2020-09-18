@@ -77,7 +77,7 @@ namespace ConnectFour.Game.Controls
         public event OnClickedFullColumnHandler OnClickedFullColumn;
 
         /// <summary>
-        /// Control that provdides a GUI interface for the <see cref="ConnectFourBoard"/> object. All graphics for the control are drawn
+        /// Control that provides a GUI interface for the <see cref="ConnectFourBoard"/> object. All graphics for the control are drawn
         /// via GDI+.
         /// </summary>
         public ConnectFourContainer()
