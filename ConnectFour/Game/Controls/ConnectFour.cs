@@ -14,7 +14,7 @@ using System.Media;
 using System.Threading;
 using System.Windows.Forms;
 
-namespace ConnectFour.Game.WindowsControls
+namespace ConnectFour.Game.Controls
 {
     public sealed partial class ConnectFour : Control
     {
