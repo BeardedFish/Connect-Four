@@ -44,7 +44,7 @@ namespace ConnectFour.Forms
             this.opponentMenu = new System.Windows.Forms.MenuItem();
             this.aboutMenu = new System.Windows.Forms.MenuItem();
             this.mainMenu = new System.Windows.Forms.MainMenu(this.components);
-            this.connectFourControl = new ConnectFour.Game.Controls.ConnectFour();
+            this.connectFourControl = new ConnectFour.Game.Controls.ConnectFourContainer();
             fileMenu = new System.Windows.Forms.MenuItem();
             settingsMenu = new System.Windows.Forms.MenuItem();
             helpMenu = new System.Windows.Forms.MenuItem();
@@ -148,7 +148,7 @@ namespace ConnectFour.Forms
         private System.Windows.Forms.MenuItem seperatorMenu;
         private System.Windows.Forms.MenuItem exitMenu;
         private System.Windows.Forms.MenuItem muteSoundEffectsMenu;
-        private Game.Controls.ConnectFour connectFourControl;
+        private Game.Controls.ConnectFourContainer connectFourControl;
         private System.Windows.Forms.MenuItem aboutMenu;
         private System.Windows.Forms.MenuItem opponentMenu;
     }

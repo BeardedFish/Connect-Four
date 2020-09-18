@@ -8,7 +8,7 @@ using System.Windows.Forms;
 
 namespace ConnectFour.Game.Controls
 {
-    public partial class ConnectFour
+    public partial class ConnectFourContainer
     {
         [Browsable(false), EditorBrowsable(EditorBrowsableState.Never), DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
         public new string AccessibleDescription { get; set; }

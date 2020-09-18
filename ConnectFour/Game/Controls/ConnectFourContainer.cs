@@ -16,7 +16,7 @@ using System.Windows.Forms;
 
 namespace ConnectFour.Game.Controls
 {
-    public sealed partial class ConnectFour : Control
+    public sealed partial class ConnectFourContainer : Control
     {
         /// <summary>
         /// The thickness of the solid lines that will be drawn.
@@ -80,7 +80,7 @@ namespace ConnectFour.Game.Controls
         /// Control that provdides a GUI interface for the <see cref="ConnectFourBoard"/> object. All graphics for the control are drawn
         /// via GDI+.
         /// </summary>
-        public ConnectFour()
+        public ConnectFourContainer()
         {
             Cursor = Cursors.Default;
             DoubleBuffered = true;
