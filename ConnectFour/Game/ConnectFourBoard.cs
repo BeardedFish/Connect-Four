@@ -1,4 +1,4 @@
-﻿// File Name:     ConnectFourBoard.cs
+// File Name:     ConnectFourBoard.cs
 // By:            Darian Benam (GitHub: https://github.com/BeardedFish/)
 // Date:          July, June 23, 2020
 
@@ -196,8 +196,6 @@ namespace ConnectFour.Game
                 throw new Exception("The number of columns must be greater than or equal to 6.");
             }
 
-            HandleSettingChanges();
-
             Columns = columns;
             Rows = rows;
             CurrentChipTurn = FirstPlayerChip;
@@ -277,7 +275,6 @@ namespace ConnectFour.Game
             if (IsGameOver)
             {
                 UpdateScore();
-                HandleSettingChanges(); // Setting changes can only occur when the game is over
 
                 OnGameOver?.Invoke(this, CurrentGameStatus);
             }
@@ -285,15 +282,6 @@ namespace ConnectFour.Game
             {
                 SwitchTurns();
             }
-        }
-
-        /// <summary>
-        /// 
-        /// </summary>
-        private void HandleSettingChanges()
-        {
-            IsOpponentComputer = Settings.Default.IsOpponentComputer;
-            FirstPlayerChip = Settings.Default.IsOpponentChipYellow ? Chip.Red : Chip.Yellow;
         }
 
         /// <summary>
