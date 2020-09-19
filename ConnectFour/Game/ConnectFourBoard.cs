@@ -208,7 +208,7 @@ namespace ConnectFour.Game
 
             if (firstPlayerChip == Chip.None)
             {
-                throw new Exception(""); // TODO: Write description...
+                throw new Exception("Invalid chip type! The first player chip can be either red or yellow.");
             }
 
             Columns = columns;
