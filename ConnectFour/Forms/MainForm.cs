@@ -40,7 +40,8 @@ namespace ConnectFour.Forms
         {
             connectFourGui = new ConnectFourContainer(Settings.Default.IsOpponentChipYellow ? Chip.Red : Chip.Yellow, Settings.Default.IsOpponentComputer)
             {
-                Dock = DockStyle.Fill
+                Dock = DockStyle.Fill,
+                IsSoundMuted = muteSoundEffectsMenu.Checked = Settings.Default.IsSoundMuted
             };
 
             connectFourGui.OnClickedFullColumn += ConnectFour_ClickedFullColumn;
