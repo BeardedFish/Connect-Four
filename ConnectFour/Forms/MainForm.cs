@@ -2,6 +2,7 @@
 // By:            Darian Benam (GitHub: https://github.com/BeardedFish/)
 // Date:          Monday, July 27, 2020
 
+using ConnectFour.Game.Controls;
 using ConnectFour.Game.Enums;
 using ConnectFour.Properties;
 using System;
@@ -23,24 +24,47 @@ namespace ConnectFour.Forms
         private readonly string prefixFormTitle;
 
         /// <summary>
+        /// The interactable control which allows either a user or users to play a game of Connect Four.
+        /// </summary>
+        private ConnectFourContainer connectFourGui;
+
+        /// <summary>
         /// States whether the form is exiting because the user confirmed that they want to exit out of the form via the <see cref="exitMenu"/> which is located under
         /// the "File" menu.
         /// </summary>
         private bool exitingFromFileMenu = false;
 
         /// <summary>
-        /// The constructor for the 'MainForm'.
+        /// Constructor for a form which contains components in order to interact with the <see cref="ConnectFourContainer"/>.
         /// </summary>
         public MainForm()
         {
             InitializeComponent();
-            SubscribeToEvents();
 
             Size = new Size(FormWidth, FormHeight);
             prefixFormTitle = Text;
-            connectFourControl.IsSoundMuted = muteSoundEffectsMenu.Checked = Settings.Default.IsSoundMuted;
 
+            SetupGameContainer();
             UpdateTitleWithCurrentTurn();
+        }
+
+        /// <summary>
+        /// Sets up the GUI control <see cref="ConnectFourContainer"/> which allows a user to play a game of Connect Four on this form.
+        /// </summary>
+        private void SetupGameContainer()
+        {
+            connectFourGui = new ConnectFourContainer(Settings.Default.IsOpponentChipYellow ? Chip.Red : Chip.Yellow, Settings.Default.IsOpponentComputer)
+            {
+                Dock = DockStyle.Fill
+            };
+
+            connectFourGui.OnClickedFullColumn += ConnectFour_ClickedFullColumn;
+            connectFourGui.GameBoard.OnGameOver += ConnectFour_GameOver;
+            connectFourGui.GameBoard.OnGameReset += ConnectFour_GameReset;
+            connectFourGui.GameBoard.OnNewGame += ConnectFour_NewGame;
+            connectFourGui.GameBoard.OnSwitchTurn += ConnectFour_SwitchTurn;
+
+            Controls.Add(connectFourGui);
         }
         
         /// <summary>
@@ -77,22 +101,11 @@ namespace ConnectFour.Forms
         }
 
         /// <summary>
-        /// Subscribes to events that the 'connectFourGameContainer' control has.
-        /// </summary>
-        private void SubscribeToEvents()
-        {
-            connectFourControl.OnClickedFullColumn += ConnectFourControl_OnClickedFullColumn;
-            connectFourControl.GameBoard.OnGameOver += GameBoard_OnGameOver;
-            connectFourControl.GameBoard.OnSwitchTurn += GameBoard_OnSwitchTurn;
-            connectFourControl.GameBoard.OnNewGame += GameBoard_OnNewGame;
-        }
-
-        /// <summary>
         /// Updates the <see cref="MainForm"/> title bar to text that states the current players turn.
         /// </summary>
         private void UpdateTitleWithCurrentTurn()
         {
-            UpdateTitle(connectFourControl?.GameBoard.CurrentChipTurn == Chip.Red ? "Red Players Turn" : "Yellow Players Turn");
+            UpdateTitle(connectFourGui?.GameBoard.CurrentChipTurn == Chip.Red ? "Red Players Turn" : "Yellow Players Turn");
         }
 
         /// <summary>
@@ -116,10 +129,10 @@ namespace ConnectFour.Forms
 
         #region Connect Four Game Event Handlers
         /// <summary>
-        /// Event handler for when a full column is clicked on the <see cref="connectFourControl"/>.
+        /// Event handler for when a full column is clicked on the <see cref="connectFourGui"/>.
         /// </summary>
         /// <param name="sender">The object that raised the event.</param>
-        private void ConnectFourControl_OnClickedFullColumn(object sender)
+        private void ConnectFour_ClickedFullColumn(object sender)
         {
             MessageBox.Show("That column is full! Try another column.", "Yikes!", MessageBoxButtons.OK, MessageBoxIcon.Error);
         }
@@ -128,7 +141,7 @@ namespace ConnectFour.Forms
         /// Event handler for when a new game of Connect Four is started.
         /// </summary>
         /// <param name="sender">The object that raised the event.</param>
-        private void GameBoard_OnNewGame(object sender)
+        private void ConnectFour_NewGame(object sender)
         {
             UpdateTitleWithCurrentTurn();
         }
@@ -138,7 +151,7 @@ namespace ConnectFour.Forms
         /// </summary>
         /// <param name="sender">The object that raised the event.</param>
         /// <param name="endResult">The end result of the game.</param>
-        private void GameBoard_OnGameOver(object sender, GameStatus endResult)
+        private void ConnectFour_GameOver(object sender, GameStatus endResult)
         {
             string suffixText;
 
@@ -155,12 +168,22 @@ namespace ConnectFour.Forms
         }
 
         /// <summary>
+        /// Event handler for when the Connect Four game 
+        /// </summary>
+        /// <param name="sender"></param>
+        private void ConnectFour_GameReset(object sender)
+        {
+            connectFourGui.GameBoard.FirstPlayerChip = Settings.Default.IsOpponentChipYellow ? Chip.Red : Chip.Yellow;
+            connectFourGui.GameBoard.IsOpponentComputer = Settings.Default.IsOpponentComputer;
+        }
+
+        /// <summary>
         /// Event handler for when the turns are switched via the <see cref="SwitchTurns"/> method.
         /// </summary>
         /// <param name="sender">The object that raised the event.</param>
-        private void GameBoard_OnSwitchTurn(object sender)
+        private void ConnectFour_SwitchTurn(object sender)
         {
-            UpdateTitle(connectFourControl?.GameBoard.CurrentChipTurn == Chip.Red ? "Red Players Turn" : "Yellow Players Turn");
+            UpdateTitle(connectFourGui?.GameBoard.CurrentChipTurn == Chip.Red ? "Red Players Turn" : "Yellow Players Turn");
         }
         #endregion
 
@@ -181,7 +204,7 @@ namespace ConnectFour.Forms
             {
                 bool resetScores = MessageBox.Show("Would you like to reset both scores to zero?", "Question", MessageBoxButtons.YesNo, MessageBoxIcon.Question) == DialogResult.Yes;
 
-                connectFourControl.GameBoard.StartNewGame(resetScores);
+                connectFourGui.GameBoard.StartNewGame(resetScores);
             }
         }
 
@@ -227,9 +250,9 @@ namespace ConnectFour.Forms
         /// <param name="e">The data about the event.</param>
         private void MuteSoundEffectsMenu_Click(object sender, EventArgs e)
         {
-            connectFourControl.IsSoundMuted = Settings.Default.IsSoundMuted = !connectFourControl.IsSoundMuted;
+            connectFourGui.IsSoundMuted = Settings.Default.IsSoundMuted = !connectFourGui.IsSoundMuted;
 
-            muteSoundEffectsMenu.Checked = connectFourControl.IsSoundMuted;
+            muteSoundEffectsMenu.Checked = connectFourGui.IsSoundMuted;
         }
         #endregion
     }

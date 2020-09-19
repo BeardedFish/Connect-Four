@@ -11,11 +11,9 @@ namespace ConnectFour.Forms
     public partial class OpponentSettingsForm : Form
     {
         /// <summary>
-        /// The index location of the CPU item in the the <see cref="opponentTypeComboBox"/>.
+        /// Variable that corresponds to the index position in the combo box on the form.
         /// </summary>
-        private const int CpuComboBoxIndex = 0, HumanComboBoxIndex = 1;
-
-        private const int RedChipComboBoxIndex = 0, YellowChipComboBoxIndex = 1;
+        private const int CpuComboBoxIndex = 0, HumanComboBoxIndex = 1, RedChipComboBoxIndex = 0, YellowChipComboBoxIndex = 1;
 
         /// <summary>
         /// States whether the the settings on the form were modified or not.
@@ -62,6 +60,11 @@ namespace ConnectFour.Forms
             opponentChipComboBox.Text = initialOpponentChipText = (Settings.Default.IsOpponentChipYellow ? opponentChipComboBox.Items[YellowChipComboBoxIndex] : opponentChipComboBox.Items[RedChipComboBoxIndex]).ToString();
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void ComboBoxIndexChangedEventHandler(object sender, EventArgs e)
         {
             applyChangesButton.Enabled = SettingsModified;

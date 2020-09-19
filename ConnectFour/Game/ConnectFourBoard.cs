@@ -1,4 +1,4 @@
-// File Name:     ConnectFourBoard.cs
+﻿// File Name:     ConnectFourBoard.cs
 // By:            Darian Benam (GitHub: https://github.com/BeardedFish/)
 // Date:          July, June 23, 2020
 
@@ -191,7 +191,10 @@ namespace ConnectFour.Game
         /// </summary>
         /// <param name="columns">The number of columns the Connect Four board should have.</param>
         /// <param name="rows">The number of rows the Connect Four board should have.</param>
-        public ConnectFourBoard(int columns, int rows)
+        /// <param name="firstPlayerChip">The chip that represents the first player.</param>
+        /// <param name="isOpponentComputer">States whether the opponent is a computer or not.</param>
+        /// <exception cref="Exception"/>
+        public ConnectFourBoard(int columns, int rows, Chip firstPlayerChip, bool isOpponentComputer)
         {
             if (columns < 7)
             {
@@ -203,9 +206,15 @@ namespace ConnectFour.Game
                 throw new Exception("The number of columns must be greater than or equal to 6.");
             }
 
+            if (firstPlayerChip == Chip.None)
+            {
+                throw new Exception(""); // TODO: Write description...
+            }
+
             Columns = columns;
             Rows = rows;
-            CurrentChipTurn = FirstPlayerChip;
+            CurrentChipTurn = FirstPlayerChip = firstPlayerChip;
+            IsOpponentComputer = isOpponentComputer;
 
             gameBoardChips = new Chip[rows, columns];
             random = new Random();
