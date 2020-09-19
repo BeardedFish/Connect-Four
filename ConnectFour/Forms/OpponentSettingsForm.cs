@@ -61,10 +61,10 @@ namespace ConnectFour.Forms
         }
 
         /// <summary>
-        /// 
+        /// Event handler for when the <see cref="opponentChipComboBox"/> or the <see cref="opponentChipComboBox"/> selected item index is changed.
         /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
+        /// <param name="sender">The object that raised the event.</param>
+        /// <param name="e">The data about the event.</param>
         private void ComboBoxIndexChangedEventHandler(object sender, EventArgs e)
         {
             applyChangesButton.Enabled = SettingsModified;
