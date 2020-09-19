@@ -13,25 +13,10 @@ namespace ConnectFour.Forms
 {
     public partial class MainForm : Form
     {
-        /// <summary>
-        /// The width and height of the <see cref="MainForm"/>.
-        /// </summary>
         private const int FormHeight = 955, FormWidth = 1430;
 
-        /// <summary>
-        /// The prefix title of the form.
-        /// </summary>
         private readonly string prefixFormTitle;
-
-        /// <summary>
-        /// The interactable control which allows either a user or users to play a game of Connect Four.
-        /// </summary>
         private ConnectFourContainer connectFourGui;
-
-        /// <summary>
-        /// States whether the form is exiting because the user confirmed that they want to exit out of the form via the <see cref="exitMenu"/> which is located under
-        /// the "File" menu.
-        /// </summary>
         private bool exitingFromFileMenu = false;
 
         /// <summary>
