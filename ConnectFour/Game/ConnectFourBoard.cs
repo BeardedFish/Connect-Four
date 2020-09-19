@@ -41,11 +41,6 @@ namespace ConnectFour.Game
                     throw new Exception("Invalid chip!");
                 }
 
-                /*if (!IsGameOver)
-                {
-                    throw new Exception("The first player chip cannot be changed unless the Connect Four game is over!");
-                }*/
-
                 _firstPlayerChip = value;
             }
         }
