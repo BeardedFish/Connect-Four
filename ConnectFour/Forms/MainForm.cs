@@ -136,16 +136,7 @@ namespace ConnectFour.Forms
         /// <param name="endResult">The end result of the game.</param>
         private void ConnectFour_GameOver(object sender, GameStatus endResult)
         {
-            string suffixText;
-
-            if (endResult == GameStatus.RedChipWon || endResult == GameStatus.YellowChipWon)
-            {
-                suffixText = $"{(endResult == GameStatus.RedChipWon ? "Red" : "Yellow")} player has won.";
-            }
-            else
-            {
-                suffixText = "Game ended in a tie.";
-            }
+            string suffixText = endResult != GameStatus.TiedGame ? $"{(endResult == GameStatus.RedChipWon ? "Red" : "Yellow")} player has won." : "Game ended in a tie.";
 
             UpdateTitle("Game Over! " + suffixText);
         }
