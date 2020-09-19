@@ -154,9 +154,9 @@ namespace ConnectFour.Forms
         }
 
         /// <summary>
-        /// Event handler for when the Connect Four game 
+        /// Event handler for when when a new game of Connect Four is being setup.
         /// </summary>
-        /// <param name="sender"></param>
+        /// <param name="sender">The object that raised the event.</param>
         private void ConnectFour_GameReset(object sender)
         {
             connectFourGui.GameBoard.FirstPlayerChip = Settings.Default.IsOpponentChipYellow ? Chip.Red : Chip.Yellow;
