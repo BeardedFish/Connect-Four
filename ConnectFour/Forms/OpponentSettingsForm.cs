@@ -81,10 +81,7 @@ namespace ConnectFour.Forms
                     MessageBoxButtons.YesNo,
                     MessageBoxIcon.Question);
 
-                if (result == DialogResult.No)
-                {
-                    e.Cancel = true;
-                }
+                e.Cancel = result == DialogResult.No;
             }
         }
 
