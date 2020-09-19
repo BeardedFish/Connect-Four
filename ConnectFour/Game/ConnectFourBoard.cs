@@ -155,6 +155,13 @@ namespace ConnectFour.Game
         public event OnGameOverHandler OnGameOver;
 
         /// <summary>
+        /// Event handler for when when a new game is being setup.
+        /// </summary>
+        /// <param name="sender">The object that raised the event.</param>
+        public delegate void OnGameResetHandler(object sender);
+        public event OnGameResetHandler OnGameReset;
+
+        /// <summary>
         /// Event handler for when a new game is started via the <see cref="StartNewGame"/> method.
         /// </summary>
         /// <param name="sender">The object that raised the event.</param>
@@ -327,6 +334,8 @@ namespace ConnectFour.Game
         /// </summary>
         public void StartNewGame(bool resetScores)
         {
+            OnGameReset?.Invoke(this);
+
             // Clear the game board
             for (int row = 0; row < gameBoardChips.GetLength(0); row++)
             {
