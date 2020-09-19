@@ -75,10 +75,7 @@ namespace ConnectFour.Forms
 
             if (InvokeRequired)
             {
-                Invoke((MethodInvoker)delegate()
-                {
-                    Text = newTitle;
-                });
+                Invoke((MethodInvoker)delegate() { Text = newTitle; });
             }
             else
             {
