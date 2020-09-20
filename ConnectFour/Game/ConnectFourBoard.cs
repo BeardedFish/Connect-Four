@@ -47,7 +47,7 @@ namespace ConnectFour.Game
         /// <summary>
         /// States the current chip's turn. The chip can be either <see cref="Chip.Red"/> or <see cref="Chip.Yellow"/>.
         /// </summary>
-        public Chip CurrentChipTurn { get; set; }
+        public Chip CurrentChipTurn { get; private set; }
 
         /// <summary>
         /// Dictionary which contains the scores of both the <see cref="Chip.Red"/> player and the <see cref="Chip.Yellow"/> player.
