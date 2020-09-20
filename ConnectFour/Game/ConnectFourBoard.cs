@@ -1,9 +1,8 @@
-﻿// File Name:     ConnectFourBoard.cs
+// File Name:     ConnectFourBoard.cs
 // By:            Darian Benam (GitHub: https://github.com/BeardedFish/)
 // Date:          July, June 23, 2020
 
 using ConnectFour.Game.Enums;
-using ConnectFour.Properties;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
