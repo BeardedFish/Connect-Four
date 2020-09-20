@@ -1,4 +1,4 @@
-// File Name:     ConnectFourBoard.cs
+﻿// File Name:     ConnectFourBoard.cs
 // By:            Darian Benam (GitHub: https://github.com/BeardedFish/)
 // Date:          July, June 23, 2020
 
@@ -335,6 +335,7 @@ namespace ConnectFour.Game
         /// <summary>
         /// Starts a new Connect Four game by clearing the Connect Four board.
         /// </summary>
+        /// <param name="resetScores">States whether the scores should be reset to zero or not.</param>
         public void StartNewGame(bool resetScores)
         {
             OnGameReset?.Invoke(this);
