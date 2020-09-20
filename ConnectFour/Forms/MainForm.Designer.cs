@@ -44,7 +44,6 @@ namespace ConnectFour.Forms
             this.opponentMenu = new System.Windows.Forms.MenuItem();
             this.aboutMenu = new System.Windows.Forms.MenuItem();
             this.mainMenu = new System.Windows.Forms.MainMenu(this.components);
-            this.connectFourControl = new ConnectFour.Game.Controls.ConnectFour();
             fileMenu = new System.Windows.Forms.MenuItem();
             settingsMenu = new System.Windows.Forms.MenuItem();
             helpMenu = new System.Windows.Forms.MenuItem();
@@ -116,20 +115,12 @@ namespace ConnectFour.Forms
             settingsMenu,
             helpMenu});
             // 
-            // connectFourControl
-            // 
-            this.connectFourControl.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.connectFourControl.IsSoundMuted = false;
-            this.connectFourControl.Location = new System.Drawing.Point(0, 0);
-            this.connectFourControl.Name = "connectFourControl";
-            this.connectFourControl.Size = new System.Drawing.Size(1406, 856);
-            // 
             // MainForm
             // 
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.None;
             this.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
+            this.BackColor = System.Drawing.Color.Black;
             this.ClientSize = new System.Drawing.Size(1406, 856);
-            this.Controls.Add(this.connectFourControl);
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.Margin = new System.Windows.Forms.Padding(4);
             this.MaximizeBox = false;
@@ -148,7 +139,6 @@ namespace ConnectFour.Forms
         private System.Windows.Forms.MenuItem seperatorMenu;
         private System.Windows.Forms.MenuItem exitMenu;
         private System.Windows.Forms.MenuItem muteSoundEffectsMenu;
-        private Game.Controls.ConnectFour connectFourControl;
         private System.Windows.Forms.MenuItem aboutMenu;
         private System.Windows.Forms.MenuItem opponentMenu;
     }

@@ -3,7 +3,6 @@
 // Date:          July, June 23, 2020
 
 using ConnectFour.Game.Enums;
-using ConnectFour.Properties;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -41,11 +40,6 @@ namespace ConnectFour.Game
                     throw new Exception("Invalid chip!");
                 }
 
-                /*if (!IsGameOver)
-                {
-                    throw new Exception("The first player chip cannot be changed unless the Connect Four game is over!");
-                }*/
-
                 _firstPlayerChip = value;
             }
         }
@@ -53,7 +47,7 @@ namespace ConnectFour.Game
         /// <summary>
         /// States the current chip's turn. The chip can be either <see cref="Chip.Red"/> or <see cref="Chip.Yellow"/>.
         /// </summary>
-        public Chip CurrentChipTurn { get; set; }
+        public Chip CurrentChipTurn { get; private set; }
 
         /// <summary>
         /// Dictionary which contains the scores of both the <see cref="Chip.Red"/> player and the <see cref="Chip.Yellow"/> player.
@@ -67,7 +61,7 @@ namespace ConnectFour.Game
         /// <summary>
         /// States whether the opponent player (yellow chip) is a computer or not.
         /// </summary>
-        public bool IsOpponentComputer { get; set; } = true;
+        public bool IsOpponentComputer { get; set; }
 
         /// <summary>
         /// States whether it is the computer players turn or not.
@@ -155,6 +149,13 @@ namespace ConnectFour.Game
         public event OnGameOverHandler OnGameOver;
 
         /// <summary>
+        /// Event handler for when when a new game is being setup.
+        /// </summary>
+        /// <param name="sender">The object that raised the event.</param>
+        public delegate void OnGameResetHandler(object sender);
+        public event OnGameResetHandler OnGameReset;
+
+        /// <summary>
         /// Event handler for when a new game is started via the <see cref="StartNewGame"/> method.
         /// </summary>
         /// <param name="sender">The object that raised the event.</param>
@@ -184,7 +185,10 @@ namespace ConnectFour.Game
         /// </summary>
         /// <param name="columns">The number of columns the Connect Four board should have.</param>
         /// <param name="rows">The number of rows the Connect Four board should have.</param>
-        public ConnectFourBoard(int columns, int rows)
+        /// <param name="firstPlayerChip">The chip that represents the first player.</param>
+        /// <param name="isOpponentComputer">States whether the opponent is a computer or not.</param>
+        /// <exception cref="Exception"/>
+        public ConnectFourBoard(int columns, int rows, Chip firstPlayerChip, bool isOpponentComputer)
         {
             if (columns < 7)
             {
@@ -196,11 +200,15 @@ namespace ConnectFour.Game
                 throw new Exception("The number of columns must be greater than or equal to 6.");
             }
 
-            HandleSettingChanges();
+            if (firstPlayerChip == Chip.None)
+            {
+                throw new Exception("Invalid chip type! The first player chip can be either red or yellow.");
+            }
 
             Columns = columns;
             Rows = rows;
-            CurrentChipTurn = FirstPlayerChip;
+            CurrentChipTurn = FirstPlayerChip = firstPlayerChip;
+            IsOpponentComputer = isOpponentComputer;
 
             gameBoardChips = new Chip[rows, columns];
             random = new Random();
@@ -277,7 +285,6 @@ namespace ConnectFour.Game
             if (IsGameOver)
             {
                 UpdateScore();
-                HandleSettingChanges(); // Setting changes can only occur when the game is over
 
                 OnGameOver?.Invoke(this, CurrentGameStatus);
             }
@@ -285,15 +292,6 @@ namespace ConnectFour.Game
             {
                 SwitchTurns();
             }
-        }
-
-        /// <summary>
-        /// 
-        /// </summary>
-        private void HandleSettingChanges()
-        {
-            IsOpponentComputer = Settings.Default.IsOpponentComputer;
-            FirstPlayerChip = Settings.Default.IsOpponentChipYellow ? Chip.Red : Chip.Yellow;
         }
 
         /// <summary>
@@ -337,8 +335,11 @@ namespace ConnectFour.Game
         /// <summary>
         /// Starts a new Connect Four game by clearing the Connect Four board.
         /// </summary>
+        /// <param name="resetScores">States whether the scores should be reset to zero or not.</param>
         public void StartNewGame(bool resetScores)
         {
+            OnGameReset?.Invoke(this);
+
             // Clear the game board
             for (int row = 0; row < gameBoardChips.GetLength(0); row++)
             {

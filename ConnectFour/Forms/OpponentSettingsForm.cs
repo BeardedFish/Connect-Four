@@ -11,11 +11,9 @@ namespace ConnectFour.Forms
     public partial class OpponentSettingsForm : Form
     {
         /// <summary>
-        /// The index location of the CPU item in the the <see cref="opponentTypeComboBox"/>.
+        /// Variable that corresponds to the index position in the combo box on the form.
         /// </summary>
-        private const int CpuComboBoxIndex = 0, HumanComboBoxIndex = 1;
-
-        private const int RedChipComboBoxIndex = 0, YellowChipComboBoxIndex = 1;
+        private const int CpuComboBoxIndex = 0, HumanComboBoxIndex = 1, RedChipComboBoxIndex = 0, YellowChipComboBoxIndex = 1;
 
         /// <summary>
         /// States whether the the settings on the form were modified or not.
@@ -62,6 +60,11 @@ namespace ConnectFour.Forms
             opponentChipComboBox.Text = initialOpponentChipText = (Settings.Default.IsOpponentChipYellow ? opponentChipComboBox.Items[YellowChipComboBoxIndex] : opponentChipComboBox.Items[RedChipComboBoxIndex]).ToString();
         }
 
+        /// <summary>
+        /// Event handler for when the <see cref="opponentChipComboBox"/> or the <see cref="opponentChipComboBox"/> selected item index is changed.
+        /// </summary>
+        /// <param name="sender">The object that raised the event.</param>
+        /// <param name="e">The data about the event.</param>
         private void ComboBoxIndexChangedEventHandler(object sender, EventArgs e)
         {
             applyChangesButton.Enabled = SettingsModified;
@@ -81,10 +84,7 @@ namespace ConnectFour.Forms
                     MessageBoxButtons.YesNo,
                     MessageBoxIcon.Question);
 
-                if (result == DialogResult.No)
-                {
-                    e.Cancel = true;
-                }
+                e.Cancel = result == DialogResult.No;
             }
         }
 
@@ -97,6 +97,7 @@ namespace ConnectFour.Forms
         {
             Settings.Default.IsOpponentComputer = opponentTypeComboBox.SelectedIndex == CpuComboBoxIndex;
             Settings.Default.IsOpponentChipYellow = opponentChipComboBox.SelectedIndex == YellowChipComboBoxIndex;
+
             initialOpponentTypeText = opponentTypeComboBox.Text;
             initialOpponentChipText = opponentChipComboBox.Text;
 

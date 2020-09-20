@@ -90,12 +90,12 @@
     <Compile Include="Forms\OpponentSettingsForm.Designer.cs">
       <DependentUpon>OpponentSettingsForm.cs</DependentUpon>
     </Compile>
-    <Compile Include="Game\Controls\ConnectFour.HideProperties.cs">
+    <Compile Include="Game\Controls\ConnectFourContainer.HideProperties.cs">
       <SubType>Component</SubType>
     </Compile>
     <Compile Include="Game\Enums\Chip.cs" />
     <Compile Include="Game\ConnectFourBoard.cs" />
-    <Compile Include="Game\Controls\ConnectFour.cs">
+    <Compile Include="Game\Controls\ConnectFourContainer.cs">
       <SubType>Component</SubType>
     </Compile>
     <Compile Include="Game\Enums\GameStatus.cs" />

@@ -16,7 +16,7 @@ using System.Windows.Forms;
 
 namespace ConnectFour.Game.Controls
 {
-    public sealed partial class ConnectFour : Control
+    public sealed partial class ConnectFourContainer : Control
     {
         /// <summary>
         /// The thickness of the solid lines that will be drawn.
@@ -77,15 +77,25 @@ namespace ConnectFour.Game.Controls
         public event OnClickedFullColumnHandler OnClickedFullColumn;
 
         /// <summary>
-        /// Control that provdides a GUI interface for the <see cref="ConnectFourBoard"/> object. All graphics for the control are drawn
-        /// via GDI+.
+        /// Creates a control that allows a user to play a game of Connect Four. This constructor sets the first player chip to red and the opponent to the computer.
         /// </summary>
-        public ConnectFour()
+        public ConnectFourContainer() : this(Chip.Red, true)
+        {
+
+        }
+
+        /// <summary>
+        /// Creates a control that allows a user to play a game of Connect Four. This constructor sets the first player chip and the opponent type to specified values via
+        /// the parameters.
+        /// </summary>
+        /// <param name="firstPlayerChip">The chip that represents the first player.</param>
+        /// <param name="isOpponentComputer">States whether the opponent is a computer or not.</param>
+        public ConnectFourContainer(Chip firstPlayerChip, bool isOpponentComputer)
         {
             Cursor = Cursors.Default;
             DoubleBuffered = true;
             Font = new Font("Arial", 18, FontStyle.Bold);
-            GameBoard = new ConnectFourBoard(7, 6);
+            GameBoard = new ConnectFourBoard(7, 6, firstPlayerChip, isOpponentComputer);
 
             SubscribeToEvents();
             OnResize(null);
