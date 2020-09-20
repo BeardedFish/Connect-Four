@@ -61,7 +61,7 @@ namespace ConnectFour.Game
         /// <summary>
         /// States whether the opponent player (yellow chip) is a computer or not.
         /// </summary>
-        public bool IsOpponentComputer { get; set; } = true;
+        public bool IsOpponentComputer { get; set; }
 
         /// <summary>
         /// States whether it is the computer players turn or not.
